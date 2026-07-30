@@ -6,6 +6,8 @@ import { notifications } from '@mantine/notifications';
 import { IconPlus, IconUpload, IconTrash, IconPhone, IconBrandWhatsapp, IconQrcode, IconBed, IconChartBar, IconChevronDown, IconChevronRight, IconUsers } from '@tabler/icons-react';
 import { api } from '../api/client';
 import Breadcrumbs from '../components/Breadcrumbs';
+import StatusDot from '../components/StatusDot';
+import EmptyState from '../components/EmptyState';
 
 export default function Participants() {
   const { id: eventId } = useParams();
@@ -90,7 +92,7 @@ export default function Participants() {
                 <Table.Td><Text size="xs">{p.hotel_name||'-'}</Text></Table.Td>
                 <Table.Td><Text size="sm">{p.phone||'-'}</Text></Table.Td>
                 <Table.Td><Text size="sm">{p.room_number ? p.room_number+' / '+p.bed_label : '-'}</Text></Table.Td>
-                <Table.Td><Badge size="sm" color={p.status==='checked_in'?'green':p.status==='arrived'?'yellow':'gray'}>{p.status}</Badge></Table.Td>
+                <Table.Td><StatusDot status={p.status} /></Table.Td>
                 <Table.Td>
                   <Group gap={4}>
                     <Tooltip label="Add child"><ActionIcon size="sm" variant="subtle" color="pink" onClick={() => { setChildForm({participant_id:p.id,name:'',age:''}); openChild(); }}><IconUsers size={14} /></ActionIcon></Tooltip>

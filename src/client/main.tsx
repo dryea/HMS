@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { MantineProvider, Button, Paper, Text, Group } from '@mantine/core';
+import { MantineProvider, Button, Paper, Text, Group, Loader, Center } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { IconDeviceMobile } from '@tabler/icons-react';
-import App from './App';
+import { MantineThemeProvider } from './theme';
+import ErrorBoundary from './components/ErrorBoundary';
+import NetworkBanner from './components/NetworkBanner';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import './styles/global.css';
 
+const App = lazy(() => import('./App'));
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((reg) => {
-      // Register background sync for offline check-ins
       if ('sync' in reg) {
-        navigator.serviceWorker.ready.then((r) => {
-          r.sync.register('sync-checkins').catch(() => {});
-        });
+        navigator.serviceWorker.ready.then((r) => r.sync.register('sync-checkins').catch(() => {}));
       }
     });
   });
@@ -47,8 +48,13 @@ function InstallPrompt() {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <MantineProvider defaultColorScheme="dark">
-      <Notifications />
-      <App />
+      <Notifications position="top-right" />
+      <NetworkBanner />
+      <ErrorBoundary>
+        <Suspense fallback={<Center h="100vh"><Loader size="lg" /></Center>}>
+          <App />
+        </Suspense>
+      </ErrorBoundary>
       <InstallPrompt />
     </MantineProvider>
   </React.StrictMode>
