@@ -1,0 +1,28 @@
+html, body, #root {
+  height: 100%; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+@media (max-width: 768px) {
+  .mantine-Container-root { padding-left: 8px; padding-right: 8px; }
+}
+.qr-scanner-video { width: 100%; max-width: 400px; border-radius: 12px; }
+.bed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.bed-card { cursor: pointer; transition: transform 0.15s; min-height: 80px; }
+.bed-card:hover { transform: scale(1.03); }
+.bed-card.occupied { opacity: 0.7; }
+.bed-card.selected { ring: 2px solid var(--mantine-color-blue-6); }
+.bed-card.vacant { border-color: var(--mantine-color-green-6) !important; }
+.bed-card.arrived { border-color: var(--mantine-color-yellow-6) !important; }
+.status-badge { text-transform: capitalize; }
+.room-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+@media print { .no-print { display: none !important; } }
+.install-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; }
+.wing-section { margin-bottom: 16px; }
+.wing-header { position: sticky; top: 0; z-index: 10; background: var(--mantine-color-body); }

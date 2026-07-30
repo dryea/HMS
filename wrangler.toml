@@ -1,0 +1,18 @@
+name = "hms"
+main = "src/worker/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat_v2"]
+
+assets = { directory = "dist", binding = "ASSETS" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hms-db"
+database_id = "13f058c2-9d0c-4595-a042-3d5e60d8b76e"
+
+[[r2_buckets]]
+binding = "QR_BUCKET"
+bucket_name = "hms-qr"
+
+[vars]
+APP_NAME = "HMS"

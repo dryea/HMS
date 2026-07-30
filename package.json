@@ -1,0 +1,38 @@
+{
+  "name": "hms",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:worker\" \"npm run dev:client\"",
+    "dev:worker": "wrangler dev --port 8787 --test-scheduled",
+    "dev:client": "vite",
+    "build:client": "vite build",
+    "deploy": "npm run build:client && wrangler deploy",
+    "migrate:local": "wrangler d1 migrations apply hms-db --local",
+    "migrate:remote": "wrangler d1 migrations apply hms-db --remote",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "html5-qrcode": "^2.3.8",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240901.0",
+    "@mantine/core": "^7.12.0",
+    "@mantine/dates": "^7.12.0",
+    "@mantine/dropzone": "^7.12.0",
+    "@mantine/hooks": "^7.12.0",
+    "@mantine/notifications": "^7.12.0",
+    "@tabler/icons-react": "^3.11.0",
+    "@types/qrcode": "^1.5.5",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "wrangler": "^3.72.0"
+  }
+}

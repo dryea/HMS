@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+*.xlsx
+PLAN.md
+COMPREHENSIVE_PLAN.md
+MEAL_SERVICE_PLAN.md
+NAVIGATION_UX_PLAN.md
+UI_UX_PLAN.md
+CHILDREN_FEATURE_PLAN.md
