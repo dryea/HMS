@@ -17,6 +17,7 @@ import { brandingRoutes } from './api/branding';
 import { portalRoutes } from './api/portal';
 import { serviceRoutes } from './api/services';
 import { reportExtRoutes } from './api/reporting-ext';
+import { eventConfigRoutes } from './api/event-config';
 
 type Bindings = {
   DB: D1Database;
@@ -45,6 +46,7 @@ app.route('/api/branding', brandingRoutes);
 app.route('/api/portal', portalRoutes);
 app.route('/api/services', serviceRoutes);
 app.route('/api/reporting-ext', reportExtRoutes);
+app.route('/api/event-config', eventConfigRoutes);
 
 app.get('*', async (c) => {
   const res = await c.env.ASSETS.fetch(c.req.raw);

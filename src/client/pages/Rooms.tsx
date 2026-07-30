@@ -4,7 +4,7 @@ import { Container, Title, Group, Button, Stack, TextInput, NumberInput, Card, T
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
-import { IconPlus, IconBed, IconChevronDown, IconChevronRight, IconUsers, IconChartBar } from '@tabler/icons-react';
+import { IconPlus, IconBed, IconChevronDown, IconChevronRight, IconUsers, IconChartBar, IconEdit } from '@tabler/icons-react';
 import { api } from '../api/client';
 import Breadcrumbs from '../components/Breadcrumbs';
 import StatusDot from '../components/StatusDot';
@@ -24,6 +24,9 @@ export default function Rooms() {
   const [participants, setParticipants] = useState<any[]>([]);
   const [gen, setGen] = useState({ hotel_id:'', floors:1, rooms_per_floor:10, room_prefix:'', beds_per_room:2, wing:'' });
   const [expandedHotels, setExpandedHotels] = useState<Record<string, boolean>>({});
+  const [editRoom, setEditRoom] = useState<any>(null);
+  const [editOpened, {open:openEdit,close:closeEdit}] = useDisclosure(false);
+  const [editForm, setEditForm] = useState({ room_number:'', floor:'', wing:'', status:'ready', room_type_id:'' });
 
   const load = async () => {
     if(!eventId) return;
@@ -77,6 +80,7 @@ export default function Rooms() {
                     {room.floor && <Badge size="sm">Floor {room.floor}</Badge>}
                     {room.wing && <Badge size="sm" variant="light">{room.wing}</Badge>}
                     <StatusDot status={room.status} />
+                    <ActionIcon size="xs" variant="subtle" onClick={(e)=>{e.stopPropagation();setEditRoom(room);setEditForm({room_number:room.room_number,floor:room.floor||'',wing:room.wing||'',status:room.status,room_type_id:room.room_type_id||''});openEdit();}}><IconEdit size={12}/></ActionIcon>
                   </Group>
                   <div className="bed-grid">
                     {(room.beds||[]).map((bed:any) => (
@@ -108,6 +112,15 @@ export default function Rooms() {
           <NumberInput label="Beds/Room" value={gen.beds_per_room} onChange={v=>setGen({...gen,beds_per_room:Number(v)})} min={1} />
           <TextInput label="Prefix" value={gen.room_prefix} onChange={e=>setGen({...gen,room_prefix:e.target.value})} />
           <Button onClick={async()=>{if(!gen.hotel_id){notifications.show({title:'Error',message:'Select a hotel',color:'red'});return;}try{await api.rooms.generate({event_id:eventId,hotel_id:gen.hotel_id,...gen});notifications.show({title:'Rooms created',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Generate</Button>
+        </Stack>
+      </Modal>
+      <Modal opened={editOpened} onClose={closeEdit} title="Edit Room">
+        <Stack>
+          <TextInput label="Room Number" value={editForm.room_number} onChange={e=>setEditForm({...editForm,room_number:e.target.value})} />
+          <TextInput label="Floor" value={editForm.floor} onChange={e=>setEditForm({...editForm,floor:e.target.value})} />
+          <TextInput label="Wing/Section" value={editForm.wing} onChange={e=>setEditForm({...editForm,wing:e.target.value})} />
+          <Select label="Status" data={[{value:'ready',label:'Ready'},{value:'occupied',label:'Occupied'},{value:'maintenance',label:'Maintenance'},{value:'dirty',label:'Dirty'}]} value={editForm.status} onChange={v=>setEditForm({...editForm,status:v||'ready'})} />
+          <Button onClick={async()=>{try{await fetch('/api/rooms/'+editRoom.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(editForm)});notifications.show({title:'Room updated',color:'green'});closeEdit();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Save Changes</Button>
         </Stack>
       </Modal>
       <Modal opened={!!assignModal} onClose={()=>setAssignModal(null)} title="Assign Bed">

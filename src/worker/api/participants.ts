@@ -63,7 +63,10 @@ app.put('/:id/assign-bed', async (c) => {
   const { bed_id } = await c.req.json();
   const bed = await c.env.DB.prepare('SELECT room_id FROM beds WHERE id=?').bind(bed_id).first();
   const room = await c.env.DB.prepare('SELECT hotel_id FROM rooms WHERE id=?').bind(bed?.room_id).first();
-  await c.env.DB.prepare('UPDATE participants SET bed_id=?, hotel_id=?, version=version+1 WHERE id=?').bind(bed_id, room?.hotel_id||null, id).run();
+  const now = new Date().toISOString();
+  const date = now.split('T')[0];
+  const time = now.split('T')[1].split('.')[0];
+  await c.env.DB.prepare('UPDATE participants SET bed_id=?, hotel_id=?, allocated_date=?, allocated_time=?, version=version+1 WHERE id=?').bind(bed_id, room?.hotel_id||null, date, time, id).run();
   await c.env.DB.prepare('UPDATE beds SET is_occupied=1 WHERE id=?').bind(bed_id).run();
   return c.json({ ok: true });
 });

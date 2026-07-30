@@ -183,8 +183,36 @@ export default function StaffDashboard() {
                 <Group mb="sm"><Text fw={500}>{svc.service_name}</Text><Badge>{svc.start_time||''}-{svc.end_time||''}</Badge></Group>
                 <Button size="xs" variant="light" color="green" mb="sm"
                   onClick={async()=>{
-                    try{await fetch('/api/services/'+event.id+'/assign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participant_ids:['all'],date:e.target.value,type_id:svc.service_type_id,hotel_id_override:hotel.id})});notifications.show({title:'Marked all present',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
+                    try{
+                      await fetch('/api/services/'+event.id+'/attendance/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event_date_service_id:svc.id})});
+                      notifications.show({title:'All marked present',color:'green'});
+                    }catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
                   }}>Mark All Present</Button>
+                <Button size="xs" variant="light" ml="xs"
+                  onClick={async()=>{
+                    try{
+                      const parts=await(await fetch('/api/services/'+event.id+'/participants/'+svc.id)).json();
+                      setServiceParticipants(parts);
+                      setActiveService(svc);
+                    }catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
+                  }}>View Participants</Button>
+                {activeService?.id===svc.id && serviceParticipants.length>0 && (
+                  <Stack mt="sm">
+                    {serviceParticipants.map((sp:any)=>(
+                      <Group key={sp.id} justify="space-between">
+                        <Text size="sm">{sp.name}</Text>
+                        <Button size="xs" variant={sp.attended?'filled':'light'} color={sp.attended?'green':'gray'}
+                          onClick={async()=>{
+                            try{
+                              await fetch('/api/services/'+event.id+'/attendance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participant_service_id:sp.ps_id,attended:!sp.attended})});
+                              const parts=await(await fetch('/api/services/'+event.id+'/participants/'+svc.id)).json();
+                              setServiceParticipants(parts);
+                            }catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
+                          }}>{sp.attended?'✓ Present':'Mark'}</Button>
+                      </Group>
+                    ))}
+                  </Stack>
+                )}
               </Card>
             ))}
             {serviceData.length===0 && <Text size="sm" c="dimmed">No services scheduled for this date</Text>}

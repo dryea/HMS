@@ -98,7 +98,7 @@ export default function Login() {
           </Tabs.Panel>
           <Tabs.Panel value="admin">
             <Stack>
-              <PasswordInput label="Admin Password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)} />
+              <PasswordInput label="Admin Password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && adminLogin()} />
               <Button fullWidth onClick={adminLogin} loading={loading}>Login</Button>
             </Stack>
           </Tabs.Panel>

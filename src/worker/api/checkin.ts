@@ -37,12 +37,14 @@ app.post('/scan', async (c) => {
     return c.json({ error: 'Concurrent scan detected — please retry', current_version: participant.version }, 409);
   }
   const now = new Date().toISOString();
+  const date = now.split('T')[0];
+  const time = now.split('T')[1].split('.')[0];
   let newStatus = participant.status;
   if (newStatus === 'allocated') newStatus = 'arrived';
   else if (newStatus === 'arrived') newStatus = 'checked_in';
   else if (newStatus === 'checked_in') newStatus = 'departed';
-  await c.env.DB.prepare('UPDATE participants SET status=?, version=version+1 WHERE id=? AND version=?')
-    .bind(newStatus, participant.id, participant.version).run();
+  await c.env.DB.prepare('UPDATE participants SET status=?, version=version+1, checkin_date=?, checkin_time=? WHERE id=? AND version=?')
+    .bind(newStatus, date, time, participant.id, participant.version).run();
   const cid = uid();
   await c.env.DB.prepare(
     'INSERT INTO checkins (id,participant_id,event_id,status,checked_by,checked_at,hotel_id) VALUES(?,?,?,?,?,?,?)'

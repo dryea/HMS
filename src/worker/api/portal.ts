@@ -79,4 +79,31 @@ app.post('/:token/survey', async (c) => {
   return c.json({ ok: true, submitted: true });
 });
 
+// Session detail with Q&A and feedback status
+app.get('/:token/sessions/:sid', async (c) => {
+  const token = c.req.param('token');
+  const p = await c.env.DB.prepare('SELECT id,event_id FROM participants WHERE qr_token=?').bind(token).first();
+  if (!p) return c.json({ error: 'Not found' }, 404);
+  const session = await c.env.DB.prepare(
+    'SELECT s.*,l.name as location_name,(SELECT id FROM participant_sessions WHERE participant_id=? AND session_id=s.id) as booked,(SELECT id FROM session_feedback WHERE participant_id=? AND session_id=s.id) as has_feedback FROM sessions s LEFT JOIN locations l ON l.id=s.location_id WHERE s.id=?'
+  ).bind(p.id, p.id, c.req.param('sid')).first();
+  if (!session) return c.json({ error: 'Not found' }, 404);
+  // Q&A count
+  const qaCount = await c.env.DB.prepare('SELECT COUNT(*) as c FROM session_questions WHERE session_id=? AND hidden=0').bind(c.req.param('sid')).first();
+  session.question_count = qaCount?.c||0;
+  return c.json(session);
+});
+
+// My dietary preference
+app.get('/:token/dietary', async (c) => {
+  const p = await c.env.DB.prepare('SELECT dietary FROM participants WHERE qr_token=?').bind(c.req.param('token')).first();
+  return c.json({ dietary: p?.dietary||'' });
+});
+
+app.post('/:token/dietary', async (c) => {
+  const { dietary } = await c.req.json();
+  await c.env.DB.prepare('UPDATE participants SET dietary=? WHERE qr_token=?').bind(dietary, c.req.param('token')).run();
+  return c.json({ ok: true });
+});
+
 export { app as portalRoutes };

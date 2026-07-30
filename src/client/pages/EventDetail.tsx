@@ -44,6 +44,9 @@ export default function EventDetail() {
       <Badge mt="xs">{event.event_code}</Badge>
 
       <SimpleGrid cols={{ base: 2, sm: 3 }} mt="lg">
+        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('schedule')}>
+          <IconCalendar size={24} /><Text size="xl">-</Text><Text size="sm">Schedule</Text>
+        </Card>
         <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('sessions')}>
           <IconCalendar size={24} /><Text size="xl">-</Text><Text size="sm">Sessions</Text>
         </Card>
@@ -97,6 +100,8 @@ export default function EventDetail() {
       ))}
 
       <Stack mt="lg">
+        <Button leftSection={<IconCalendar size={20} />} onClick={() => nav('schedule')} fullWidth variant="light">Schedule Planner</Button>
+        <Button leftSection={<IconSettings size={20} />} onClick={() => nav('configure')} fullWidth variant="light">Event Config</Button>
         <Button leftSection={<IconCalendar size={20} />} onClick={() => nav('sessions')} fullWidth variant="light">Program Sessions</Button>
         <Button leftSection={<IconMap size={20} />} onClick={() => nav('locations')} fullWidth variant="light">Locations & Venues</Button>
         <Button leftSection={<IconBuildingStore size={20} />} onClick={() => nav('services')} fullWidth variant="light">Service Schedule</Button>

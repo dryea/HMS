@@ -54,4 +54,46 @@ app.post('/:eid/assign', async (c) => {
   return c.json({ assigned: count });
 });
 
+// Get participants for a specific service with attendance status
+app.get('/:eid/participants/:edsId', async (c) => {
+  const { results } = await c.env.DB.prepare(
+    `SELECT ps.id as ps_id, p.id, p.name, p.phone, p.hotel_id, sa.attended, sa.marked_at
+     FROM participant_services ps
+     JOIN participants p ON p.id=ps.participant_id
+     LEFT JOIN service_attendance sa ON sa.participant_service_id=ps.id
+     WHERE ps.event_date_service_id=?
+     ORDER BY p.name`
+  ).bind(c.req.param('edsId')).all();
+  return c.json(results);
+});
+
+// Mark individual attendance for a service
+app.post('/:eid/attendance', async (c) => {
+  const { participant_service_id, attended } = await c.req.json();
+  const existing = await c.env.DB.prepare('SELECT id FROM service_attendance WHERE participant_service_id=?').bind(participant_service_id).first();
+  if (existing) {
+    await c.env.DB.prepare('UPDATE service_attendance SET attended=?, marked_at=datetime(?) WHERE id=?').bind(attended?1:0, new Date().toISOString(), existing.id).run();
+  } else {
+    await c.env.DB.prepare('INSERT INTO service_attendance (id,participant_service_id,attended,marked_at) VALUES(?,?,?,?)')
+      .bind(uid(), participant_service_id, attended?1:0, new Date().toISOString()).run();
+  }
+  return c.json({ ok: true });
+});
+
+// Mark all participants for a service as present
+app.post('/:eid/attendance/bulk', async (c) => {
+  const { event_date_service_id } = await c.req.json();
+  const { results } = await c.env.DB.prepare('SELECT id as ps_id FROM participant_services WHERE event_date_service_id=?').bind(event_date_service_id).all();
+  for (const ps of results) {
+    const existing = await c.env.DB.prepare('SELECT id FROM service_attendance WHERE participant_service_id=?').bind(ps.ps_id).first();
+    if (existing) {
+      await c.env.DB.prepare('UPDATE service_attendance SET attended=1, marked_at=datetime(?) WHERE id=?').bind(new Date().toISOString(), existing.id).run();
+    } else {
+      await c.env.DB.prepare('INSERT INTO service_attendance (id,participant_service_id,attended,marked_at) VALUES(?,?,?,?)')
+        .bind(uid(), ps.ps_id, 1, new Date().toISOString()).run();
+    }
+  }
+  return c.json({ marked: results.length });
+});
+
 export { app as serviceRoutes };

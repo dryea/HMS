@@ -20,11 +20,16 @@ const AdminAnnouncements = lazy(() => import('./pages/AdminAnnouncements'));
 const AdminSurvey = lazy(() => import('./pages/AdminSurvey'));
 const AdminBranding = lazy(() => import('./pages/AdminBranding'));
 const AdminServices = lazy(() => import('./pages/AdminServices'));
+const AdminSchedulePlanner = lazy(() => import('./pages/AdminSchedulePlanner'));
+const AdminEventConfig = lazy(() => import('./pages/AdminEventConfig'));
+const AdminQandA = lazy(() => import('./pages/AdminQandA'));
 const PortalDashboard = lazy(() => import('./pages/PortalDashboard'));
 const PortalSchedule = lazy(() => import('./pages/PortalSchedule'));
 const PortalLocations = lazy(() => import('./pages/PortalLocations'));
 const PortalAnnouncements = lazy(() => import('./pages/PortalAnnouncements'));
 const PortalSurvey = lazy(() => import('./pages/PortalSurvey'));
+const PortalSessionDetail = lazy(() => import('./pages/PortalSessionDetail'));
+const PortalDietary = lazy(() => import('./pages/PortalDietary'));
 
 const router = createBrowserRouter([
   { path: '/', element: <Login /> },
@@ -38,6 +43,8 @@ const router = createBrowserRouter([
     { path: 'locations', element: <PortalLocations /> },
     { path: 'announcements', element: <PortalAnnouncements /> },
     { path: 'survey', element: <PortalSurvey /> },
+    { path: 'sessions/:sid', element: <PortalSessionDetail /> },
+    { path: 'dietary', element: <PortalDietary /> },
   ]},
   { path: '/admin', element: <Layout />, children: [
     { index: true, element: <SuperAdmin /> },
@@ -54,6 +61,9 @@ const router = createBrowserRouter([
     { path: 'events/:id/survey', element: <AdminSurvey /> },
     { path: 'events/:id/branding', element: <AdminBranding /> },
     { path: 'events/:id/services', element: <AdminServices /> },
+    { path: 'events/:id/schedule', element: <AdminSchedulePlanner /> },
+    { path: 'events/:id/configure', element: <AdminEventConfig /> },
+    { path: 'events/:id/sessions/:sid/qanda', element: <AdminQandA /> },
   ]},
 ]);
 

@@ -70,4 +70,11 @@ app.put('/:id/status', async (c) => {
   return c.json({ ok: true });
 });
 
+app.put('/:id', async (c) => {
+  const b = await c.req.json();
+  await c.env.DB.prepare('UPDATE rooms SET room_number=?,floor=?,wing=?,status=?,room_type_id=? WHERE id=?')
+    .bind(b.room_number, b.floor||null, b.wing||null, b.status||'ready', b.room_type_id||null, c.req.param('id')).run();
+  return c.json({ ok: true });
+});
+
 export { app as roomRoutes };
