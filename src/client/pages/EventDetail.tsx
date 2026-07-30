@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Title, Text, SimpleGrid, Card, Group, Button, Stack, Badge, ActionIcon, Tooltip } from '@mantine/core';
-import { IconBed, IconUsers, IconDoor, IconQrcode, IconBuilding, IconCopy, IconArrowRight } from '@tabler/icons-react';
+import { IconBed, IconUsers, IconDoor, IconQrcode, IconBuilding, IconCopy, IconArrowRight, IconCalendar, IconMap, IconBell, IconClipboardCheck, IconPalette, IconBuildingStore } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { api } from '../api/client';
 import Breadcrumbs from '../components/Breadcrumbs';
@@ -42,6 +42,18 @@ export default function EventDetail() {
       <Text c="dimmed" size="sm">{event.description}</Text>
       <Text size="xs" c="dimmed">{event.start_date} to {event.end_date}</Text>
       <Badge mt="xs">{event.event_code}</Badge>
+
+      <SimpleGrid cols={{ base: 2, sm: 3 }} mt="lg">
+        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('sessions')}>
+          <IconCalendar size={24} /><Text size="xl">-</Text><Text size="sm">Sessions</Text>
+        </Card>
+        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('locations')}>
+          <IconMap size={24} /><Text size="xl">-</Text><Text size="sm">Locations</Text>
+        </Card>
+        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('services')}>
+          <IconBuildingStore size={24} /><Text size="xl">-</Text><Text size="sm">Services</Text>
+        </Card>
+      </SimpleGrid>
 
       <SimpleGrid cols={{ base: 2, sm: 4 }} mt="lg">
         <Card withBorder padding="md" radius="md" ta="center" onClick={() => nav('dashboard')}>
@@ -85,6 +97,12 @@ export default function EventDetail() {
       ))}
 
       <Stack mt="lg">
+        <Button leftSection={<IconCalendar size={20} />} onClick={() => nav('sessions')} fullWidth variant="light">Program Sessions</Button>
+        <Button leftSection={<IconMap size={20} />} onClick={() => nav('locations')} fullWidth variant="light">Locations & Venues</Button>
+        <Button leftSection={<IconBuildingStore size={20} />} onClick={() => nav('services')} fullWidth variant="light">Service Schedule</Button>
+        <Button leftSection={<IconBell size={20} />} onClick={() => nav('announcements')} fullWidth variant="light">Announcements</Button>
+        <Button leftSection={<IconClipboardCheck size={20} />} onClick={() => nav('survey')} fullWidth variant="light">Survey</Button>
+        <Button leftSection={<IconPalette size={20} />} onClick={() => nav('branding')} fullWidth variant="light">Event Branding</Button>
         <Button leftSection={<IconDoor size={20} />} onClick={() => nav('rooms')} fullWidth variant="light">All Rooms & Beds</Button>
         <Button leftSection={<IconUsers size={20} />} onClick={() => nav('participants')} fullWidth variant="light">All Participants</Button>
         <Button leftSection={<IconQrcode size={20} />} onClick={() => nav('dashboard')} fullWidth variant="light">Dashboard & QR</Button>

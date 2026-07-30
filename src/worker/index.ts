@@ -9,6 +9,14 @@ import { qrRoutes } from './api/qr';
 import { reportRoutes } from './api/reporting';
 import { hotelRoutes } from './api/hotels';
 import { childRoutes } from './api/children';
+import { sessionRoutes } from './api/sessions';
+import { locationRoutes } from './api/locations';
+import { announcementRoutes } from './api/announcements';
+import { surveyRoutes } from './api/surveys';
+import { brandingRoutes } from './api/branding';
+import { portalRoutes } from './api/portal';
+import { serviceRoutes } from './api/services';
+import { reportExtRoutes } from './api/reporting-ext';
 
 type Bindings = {
   DB: D1Database;
@@ -29,6 +37,14 @@ app.route('/api/qr', qrRoutes);
 app.route('/api/reporting', reportRoutes);
 app.route('/api/hotels', hotelRoutes);
 app.route('/api/participants', childRoutes);
+app.route('/api/sessions', sessionRoutes);
+app.route('/api/locations', locationRoutes);
+app.route('/api/announcements', announcementRoutes);
+app.route('/api/surveys', surveyRoutes);
+app.route('/api/branding', brandingRoutes);
+app.route('/api/portal', portalRoutes);
+app.route('/api/services', serviceRoutes);
+app.route('/api/reporting-ext', reportExtRoutes);
 
 app.get('*', async (c) => {
   const res = await c.env.ASSETS.fetch(c.req.raw);
