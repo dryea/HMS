@@ -77,11 +77,34 @@ export default function AdminEventConfig() {
               <Text size="sm" fw={500}>Logo</Text>
               {branding.logo_url && <Image src={'https://hms.sudeepdhakal.workers.dev/'+branding.logo_url} h={80} fit="contain" />}
               <FileInput accept="image/png,image/jpeg,image/svg+xml" placeholder="Upload logo" onChange={uploadLogo} />
+              
+              <Text size="sm" fw={500} mt="md">Preset Themes</Text>
+              <SimpleGrid cols={3} spacing="sm">
+                {[
+                  {id:'ocean',name:'Ocean',banner:'#0D1117',accent:'#1E88E5'},
+                  {id:'forest',name:'Forest',banner:'#0D1F11',accent:'#2E7D32'},
+                  {id:'sunset',name:'Sunset',banner:'#1F0D0D',accent:'#E65100'},
+                  {id:'royal',name:'Royal',banner:'#1A0D2E',accent:'#7B1FA2'},
+                  {id:'teal',name:'Teal',banner:'#0D1F1A',accent:'#00897B'},
+                  {id:'slate',name:'Slate',banner:'#111318',accent:'#546E7A'},
+                ].map(p => (
+                  <Card key={p.id} withBorder padding="xs" radius="md" ta="center"
+                    className={'preset-card'+(branding.banner_color===p.banner&&branding.accent_color===p.accent?' active':'')}
+                    onClick={()=>setBranding({...branding,banner_color:p.banner,accent_color:p.accent})}>
+                    <div style={{width:'100%',height:24,background:`linear-gradient(90deg, ${p.banner}, ${p.accent})`,borderRadius:4,marginBottom:4}} />
+                    <Text size="xs">{p.name}</Text>
+                  </Card>
+                ))}
+              </SimpleGrid>
+              
               <SimpleGrid cols={2}>
                 <ColorInput label="Banner Color" value={branding.banner_color} onChange={v=>setBranding({...branding,banner_color:v})} />
                 <ColorInput label="Accent Color" value={branding.accent_color} onChange={v=>setBranding({...branding,accent_color:v})} />
               </SimpleGrid>
-              <div style={{background:branding.banner_color,padding:20,borderRadius:8}}><Text c={branding.accent_color} fw={700} size="xl">Preview</Text><Text c="white" size="sm">Participant portal will use these colors</Text></div>
+              <div style={{background:`linear-gradient(135deg, ${branding.banner_color}, ${branding.accent_color})`,padding:20,borderRadius:8}}>
+                <Text c="white" fw={700} size="xl" style={{textShadow:'0 1px 2px rgba(0,0,0,0.3)'}}>Preview</Text>
+                <Text c="white" size="sm" opacity={0.9}>Participant portal will use these colors</Text>
+              </div>
               <Button onClick={saveBranding}>Save Branding</Button>
             </Stack>
           </Card>

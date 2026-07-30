@@ -51,7 +51,7 @@ export default function Events() {
       ) : (
       <SimpleGrid cols={{ base: 1, sm: 2 }}>
         {events.map((e: any, i:number) => (
-          <MotionCard key={e.id} padding="md" radius="md" withBorder initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:i*0.05}}>
+          <MotionCard key={e.id} padding="md" radius="md" withBorder className="card-accent-top" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:i*0.05}}>
             <Group justify="space-between" mb="xs">
               <Group><IconBuilding size={18} /><Title order={5}>{e.name}</Title></Group>
               <Group gap={4}>

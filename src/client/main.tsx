@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { MantineProvider, Button, Paper, Text, Group, Loader, Center } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { IconDeviceMobile } from '@tabler/icons-react';
-import { MantineThemeProvider } from './theme';
+import { appTheme } from './theme';
 import ErrorBoundary from './components/ErrorBoundary';
 import NetworkBanner from './components/NetworkBanner';
 import '@mantine/core/styles.css';
@@ -47,7 +47,7 @@ function InstallPrompt() {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <MantineProvider defaultColorScheme="dark">
+    <MantineProvider defaultColorScheme="light" theme={appTheme}>
       <Notifications position="top-right" />
       <NetworkBanner />
       <ErrorBoundary>

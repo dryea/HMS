@@ -22,7 +22,7 @@ export default function TabBar({ eventId }: { eventId?: string }) {
   const current = loc.pathname.split('/').pop() || '';
 
   return (
-    <Paper radius={0} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, borderTop: '1px solid var(--mantine-color-dark-4)', overflowX: 'auto' }}>
+    <Paper radius={0} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, borderTop: '1px solid rgba(0,0,0,0.04)', overflowX: 'auto', background: '#FFFFFF' }}>
       <Group justify="space-around" p="xs" style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)', flexWrap: 'nowrap', minWidth: 'max-content' }}>
         {adminTabs.map((t) => {
           const Icon = t.icon;

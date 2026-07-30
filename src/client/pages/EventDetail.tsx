@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Title, Text, SimpleGrid, Card, Group, Button, Stack, Badge, ActionIcon, Tooltip } from '@mantine/core';
-import { IconBed, IconUsers, IconDoor, IconQrcode, IconBuilding, IconCopy, IconArrowRight, IconCalendar, IconMap, IconBell, IconClipboardCheck, IconPalette, IconBuildingStore } from '@tabler/icons-react';
+import { IconBed, IconUsers, IconDoor, IconQrcode, IconBuilding, IconCopy, IconArrowRight, IconCalendar, IconMap, IconBell, IconClipboardCheck, IconPalette, IconBuildingStore, IconSettings } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { api } from '../api/client';
 import Breadcrumbs from '../components/Breadcrumbs';
