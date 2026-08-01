@@ -30,6 +30,7 @@ export default function EventDetail() {
     { icon: IconBuildingStore, label: 'Services', path: 'services' },
     { icon: IconDoor, label: 'Rooms', path: 'rooms' },
     { icon: IconUsers, label: 'Participants', path: 'participants' },
+    { icon: IconUsers, label: 'Name Tags', path: 'nametags' },
     { icon: IconQrcode, label: 'Dashboard', path: 'dashboard' },
     { icon: IconBell, label: 'Announcements', path: 'announcements' },
     { icon: IconClipboardCheck, label: 'Survey', path: 'survey' },

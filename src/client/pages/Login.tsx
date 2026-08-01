@@ -48,8 +48,8 @@ export default function Login() {
   return (
     <div className="page-container" style={{maxWidth:400,marginTop:80}}>
       <div className="md3-card p-24">
-        <h1 className="md3-headline-small m-0 mb-4" style={{textAlign:'center'}}>HMS</h1>
-        <p className="md3-body-medium m-0 mb-24" style={{textAlign:'center',color:'var(--md-on-surface-variant)'}}>Hotel Management System</p>
+        <h1 className="md3-headline-small m-0 mb-4" style={{textAlign:'center'}}>SummitStay</h1>
+        <p className="md3-body-medium m-0 mb-24" style={{textAlign:'center',color:'var(--md-on-surface-variant)'}}>Event Hotel Management System Hotel Management Platform</p>
 
         <div className="flex gap-8 mb-20" style={{background:'var(--md-surface-container-high)',borderRadius:9999,padding:4}}>
           <button className="md3-chip" data-selected={tab==='staff'} onClick={()=>setTab('staff')} style={{flex:1,justifyContent:'center'}}>Staff</button>

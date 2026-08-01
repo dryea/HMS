@@ -24,6 +24,7 @@ const AdminSchedulePlanner = lazy(() => import('./pages/AdminSchedulePlanner'));
 const AdminEventConfig = lazy(() => import('./pages/AdminEventConfig'));
 const AdminQandA = lazy(() => import('./pages/AdminQandA'));
 const AdminProgram = lazy(() => import('./pages/AdminProgram'));
+const NameTags = lazy(() => import('./pages/NameTags'));
 const PortalDashboard = lazy(() => import('./pages/PortalDashboard'));
 const PortalSchedule = lazy(() => import('./pages/PortalSchedule'));
 const PortalLocations = lazy(() => import('./pages/PortalLocations'));
@@ -64,6 +65,7 @@ const router = createBrowserRouter([
     { path: 'events/:id/services', element: <AdminServices /> },
     { path: 'events/:id/schedule', element: <AdminSchedulePlanner /> },
     { path: 'events/:id/program', element: <AdminProgram /> },
+    { path: 'events/:id/nametags', element: <NameTags /> },
     { path: 'events/:id/configure', element: <AdminEventConfig /> },
     { path: 'events/:id/sessions/:sid/qanda', element: <AdminQandA /> },
   ]},

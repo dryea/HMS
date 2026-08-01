@@ -123,4 +123,9 @@ app.get('/pdf/:eventId', async (c) => {
   return c.newResponse(html, { headers: {'Content-Type':'text/html','Cache-Control':'no-cache'} });
 });
 
+app.get('/csv-template', async (c) => {
+  const csv = 'ein,name,phone,email,company,department,children\n1992,John Doe,+9779800000001,john@company.com,Acme Corp,Sales,"Aarav(3);Neha(5)"';
+  return c.newResponse(csv, { headers: { 'Content-Type': 'text/csv', 'Content-Disposition': 'attachment; filename=participants_template.csv', 'Cache-Control': 'no-cache' } });
+});
+
 export { app as reportRoutes };

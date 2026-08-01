@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import QRCode from 'qrcode/lib/server';
+import JSZip from 'jszip';
 
 const app = new Hono<{ Bindings: { DB: D1Database; QR_BUCKET: R2Bucket } }>();
 
@@ -48,6 +49,28 @@ app.post('/generate/:eventId', async (c) => {
     await c.env.DB.prepare('UPDATE participants SET qr_r2_key=? WHERE id=?').bind(key, p.id).run();
   }
   return c.json({ count: parts.length });
+});
+
+// Download all participant QR codes as a ZIP
+app.get('/download-all/:eventId', async (c) => {
+  const eid = c.req.param('eventId');
+  const ev = await c.env.DB.prepare('SELECT event_code FROM events WHERE id=?').bind(eid).first();
+  const { results: parts } = await c.env.DB.prepare(
+    'SELECT p.id,p.name,p.qr_token,r.room_number FROM participants p LEFT JOIN beds b ON b.id=p.bed_id LEFT JOIN rooms r ON r.id=b.room_id WHERE p.event_id=? ORDER BY p.name'
+  ).bind(eid).all();
+  const origin = baseUrl(c.req.url);
+  const zip = new JSZip();
+  for (const p of parts) {
+    const url = origin + '/staff/' + ev.event_code + '?token=' + p.qr_token;
+    const buf = await QRCode.toBuffer(url, { width: 400, margin: 2 });
+    const safeName = p.name.replace(/[^a-zA-Z0-9]+/g, '_').slice(0, 30);
+    const roomSuffix = p.room_number ? '_' + p.room_number : '';
+    zip.file(safeName + roomSuffix + '.png', buf);
+  }
+  const zipBlob = await zip.generateAsync({ type: 'uint8array' });
+  return c.newResponse(zipBlob, {
+    headers: { 'Content-Type': 'application/zip', 'Content-Disposition': 'attachment; filename=qrcodes.zip' }
+  });
 });
 
 export { app as qrRoutes };

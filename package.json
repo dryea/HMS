@@ -16,7 +16,9 @@
     "framer-motion": "^12.43.0",
     "hono": "^4.6.0",
     "html5-qrcode": "^2.3.8",
-    "qrcode": "^1.5.4"
+    "jszip": "^3.10.1",
+    "qrcode": "^1.5.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240901.0",

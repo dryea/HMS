@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconUpload, IconTrash, IconPhone, IconBrandWhatsapp, IconQrcode, IconBed, IconChartBar, IconUsers } from '@tabler/icons-react';
+import { IconPlus, IconUpload, IconTrash, IconPhone, IconBrandWhatsapp, IconQrcode, IconBed, IconChartBar, IconUsers, IconDownload, IconFileDownload } from '@tabler/icons-react';
 import { api } from '../api/client';
 import { Modal, TextInput, Select } from '@mantine/core';
+import * as XLSX from 'xlsx';
 
 export default function Participants() {
   const { id: eventId } = useParams();
@@ -43,6 +44,7 @@ export default function Participants() {
         <div className="flex gap-8">
           <button className="md3-btn-text" onClick={()=>window.location.href='/admin/events/'+eventId+'/rooms'}><IconBed size={18}/> Rooms</button>
           <button className="md3-btn-text" onClick={()=>window.location.href='/admin/events/'+eventId+'/dashboard'}><IconChartBar size={18}/> Dash</button>
+          <a className="md3-btn-text" style={{textDecoration:'none'}} href={'/api/qr/download-all/'+eventId}><IconDownload size={18}/> QR Zip</a>
           <button className="md3-btn-text" onClick={openBulk}><IconUpload size={18}/> CSV</button>
           <button className="md3-btn" onClick={open}><IconPlus size={18}/> Add</button>
         </div>
@@ -112,10 +114,32 @@ export default function Participants() {
       <Modal opened={bulkOpened} onClose={closeBulk} title="Bulk Import" fullScreen>
         <div className="flex flex-col gap-12">
           <Select label="Hotel" data={hotels.map(h=>({value:h.id,label:h.name}))} value={form.hotel_id} onChange={v=>setForm({...form,hotel_id:v||''})} searchable />
+          <div className="flex gap-8 items-center">
+            <p className="md3-body-small" style={{color:'var(--md-on-surface-variant)'}}>Upload Excel (.xlsx) or CSV file:</p>
+            <a className="md3-btn-text" href="/api/reporting/csv-template" download><IconFileDownload size={16}/> Template</a>
+          </div>
+          <input type="file" accept=".xlsx,.xls,.csv" className="md3-text-field" style={{minHeight:44,padding:'8px 12px'}}
+            onChange={async(e)=>{
+              const file = e.target.files?.[0];
+              if(!file) return;
+              try{
+                const data = await file.arrayBuffer();
+                const wb = XLSX.read(data);
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+                const lines = rows.slice(1).filter((r:any)=>r && r[1]).map((r:any)=>({ein:String(r[0]||'').trim(),name:String(r[1]||'').trim(),phone:String(r[2]||'').trim(),email:String(r[3]||'').trim(),company:String(r[4]||'').trim(),department:String(r[5]||'').trim(),children:String(r[6]||'')}));
+                if(!lines.length){notifications.show({title:'No data found',message:'Ensure first row is headers: ein,name,phone,email,company,department,children',color:'red'});return;}
+                const result = await api.participants.bulk({event_id:eventId,hotel_id:form.hotel_id||null,participants:lines});
+                if(result?.participants){for(let i=0;i<result.participants.length;i++){const ch=lines[i]?.children;if(ch){ch.split(';').filter(Boolean).forEach((c:string)=>{const m=c.match(/(.+?)\((\d+)\)/);if(m)fetch('/api/participants/'+result.participants[i].id+'/children',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:m[1].trim(),age:parseInt(m[2])})});});}}}
+                notifications.show({title:'Imported '+lines.length+' participants',color:'green'});closeBulk();load();
+              }catch(err){notifications.show({title:'Error',message:'Could not parse file',color:'red'});}
+            }} />
+          <div className="flex items-center gap-8"><div style={{flex:1,height:1,background:'var(--md-outline-variant)'}}/><span className="md3-body-small" style={{color:'var(--md-on-surface-variant)'}}>or paste CSV</span><div style={{flex:1,height:1,background:'var(--md-outline-variant)'}}/></div>
           <p className="md3-body-small" style={{color:'var(--md-on-surface-variant)'}}>CSV: ein, name, phone, email, company, dept, children (name(age);...)</p>
           <textarea className="md3-text-field" rows={8} placeholder="1992, John Doe, +977, j@c.com, Acme, Sales, Aarav(3);Neha(5)" value={bulkText} onChange={e=>setBulkText(e.target.value)} style={{minHeight:160}} />
           <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{
             const lines = bulkText.trim().split('\n').map(l=>{const p=l.split(',').map(s=>s.trim());const ch=p[6]||'';return{ein:p[0]||'',name:p[1]||'',phone:p[2]||'',email:p[3]||'',company:p[4]||'',department:p[5]||'',children:ch};}).filter(p=>p.name);
+            if(!lines.length){notifications.show({title:'Nothing to import',color:'red'});return;}
             try{
               const r = await api.participants.bulk({event_id:eventId,hotel_id:form.hotel_id||null,participants:lines});
               if(r?.participants){for(let i=0;i<r.participants.length;i++){const ch=lines[i]?.children;if(ch){ch.split(';').filter(Boolean).forEach((c:string)=>{const m=c.match(/(.+?)\((\d+)\)/);if(m)fetch('/api/participants/'+r.participants[i].id+'/children',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:m[1].trim(),age:parseInt(m[2])})});});}}}

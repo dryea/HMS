@@ -1,9 +1,11 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { IconDoorExit, IconHome, IconBed, IconUsers, IconChartBar, IconCalendar, IconBuilding } from '@tabler/icons-react';
+import { useMantineColorScheme } from '@mantine/core';
+import { IconDoorExit, IconHome, IconBed, IconUsers, IconChartBar, IconCalendar, IconBuilding, IconSun, IconMoon } from '@tabler/icons-react';
 
 export default function Layout() {
   const nav = useNavigate();
   const loc = useLocation();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const parts = loc.pathname.split('/');
   const eventIdx = parts.indexOf('events');
@@ -25,8 +27,11 @@ export default function Layout() {
     <div style={{ background: 'var(--md-background)', minHeight: '100vh', paddingBottom: 96 }}>
       <header className="md3-top-app-bar">
         <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }} onClick={() => nav('/admin')}>
-          <span className="md3-title-large" style={{ color: 'var(--md-on-surface)' }}>HMS</span>
+          <span className="md3-title-large" style={{ color: 'var(--md-on-surface)' }}>SummitStay</span>
         </div>
+        <button className="md3-btn-text" onClick={toggleColorScheme} style={{ minWidth: 40, padding: 8 }} title="Toggle theme">
+          {colorScheme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
+        </button>
         <button className="md3-btn-text" onClick={() => nav('/')} style={{ minWidth: 40, padding: 8 }}>
           <IconDoorExit size={20} />
         </button>
