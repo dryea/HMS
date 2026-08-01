@@ -31,6 +31,7 @@ export default function EventDetail() {
     { icon: IconDoor, label: 'Rooms', path: 'rooms' },
     { icon: IconUsers, label: 'Participants', path: 'participants' },
     { icon: IconUsers, label: 'Name Tags', path: 'nametags' },
+    { icon: IconBell, label: 'Activity Log', path: 'activity' },
     { icon: IconQrcode, label: 'Dashboard', path: 'dashboard' },
     { icon: IconBell, label: 'Announcements', path: 'announcements' },
     { icon: IconClipboardCheck, label: 'Survey', path: 'survey' },

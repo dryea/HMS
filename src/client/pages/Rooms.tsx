@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconBed, IconChevronDown, IconChevronRight, IconUsers, IconChartBar, IconEdit } from '@tabler/icons-react';
+import { IconPlus, IconBed, IconChevronDown, IconChevronRight, IconUsers, IconChartBar, IconEdit, IconGridDots } from '@tabler/icons-react';
 import { api } from '../api/client';
 import { Skeleton, Modal, TextInput, NumberInput, Select } from '@mantine/core';
+import RoomVisualizer from '../components/RoomVisualizer';
 
 export default function Rooms() {
   const { id: eventId } = useParams();
@@ -21,6 +22,7 @@ export default function Rooms() {
   const [gen, setGen] = useState({ hotel_id:'', floors:1, rooms_per_floor:10, room_prefix:'', beds_per_room:2, wing:'' });
   const [editForm, setEditForm] = useState({ room_number:'', floor:'', wing:'', status:'ready' });
   const [expandedHotels, setExpandedHotels] = useState<Record<string, boolean>>({});
+  const [visualMode, setVisualMode] = useState(false);
 
   const load = async () => {
     if(!eventId) return; setLoading(true);
@@ -44,11 +46,14 @@ export default function Rooms() {
         <div className="flex gap-8">
           <button className="md3-btn-text" onClick={()=>nav('../participants')}><IconUsers size={18} /> People</button>
           <button className="md3-btn-text" onClick={()=>nav('../dashboard')}><IconChartBar size={18} /> Dash</button>
+          <button className="md3-btn-text" onClick={()=>setVisualMode(!visualMode)}><IconGridDots size={18} /> {visualMode?'List':'Drag & Drop'}</button>
           <button className="md3-btn" onClick={open}><IconPlus size={18} /> Generate</button>
         </div>
       </div>
 
-      {Object.keys(grouped).length === 0 ? (
+      {visualMode ? (
+        <RoomVisualizer rooms={rooms} unassigned={unassigned} onChanged={load} />
+      ) : Object.keys(grouped).length === 0 ? (
         <div className="md3-card p-24" style={{textAlign:'center'}}>
           <IconBed size={48} style={{opacity:0.3,marginBottom:16}} />
           <p className="md3-body-medium m-0 mb-8">No rooms yet</p>

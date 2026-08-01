@@ -1,7 +1,24 @@
 import { Hono } from 'hono';
+import { logAudit } from './system';
 
 const app = new Hono<{ Bindings: { DB: D1Database } }>();
 function uid() { return crypto.randomUUID(); }
+
+// Simple in-memory rate limiter (per worker instance)
+const scanLog = new Map<string, { count: number; windowStart: number }>();
+const RATE_LIMIT = 30; // max scans per 10 seconds per IP
+
+function rateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = scanLog.get(ip);
+  if (!entry || now - entry.windowStart > 10000) {
+    scanLog.set(ip, { count: 1, windowStart: now });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
 
 app.get('/event/:eventId', async (c) => {
   const eid = c.req.param('eventId');
@@ -18,6 +35,8 @@ app.get('/event/:eventId', async (c) => {
 });
 
 app.post('/scan', async (c) => {
+  const ip = c.req.header('cf-connecting-ip') || 'unknown';
+  if (!rateLimit(ip)) return c.json({ error: 'Too many scans. Please slow down.' }, 429);
   const { qr_token, checked_by, hotel_id, expected_version } = await c.req.json();
   const participant = await c.env.DB.prepare(
     'SELECT p.id, p.event_id, p.name, p.status, p.hotel_id, p.version, e.end_date FROM participants p JOIN events e ON e.id=p.event_id WHERE p.qr_token=?'
@@ -49,6 +68,7 @@ app.post('/scan', async (c) => {
   await c.env.DB.prepare(
     'INSERT INTO checkins (id,participant_id,event_id,status,checked_by,checked_at,hotel_id) VALUES(?,?,?,?,?,?,?)'
   ).bind(cid, participant.id, participant.event_id, newStatus, checked_by||'staff', now, hotel_id||null).run();
+  await logAudit(c.env.DB, participant.event_id, 'checkin', 'participant', participant.id, { name: participant.name, from: participant.status, to: newStatus, staff: checked_by }, checked_by||'staff');
   return c.json({ participant: participant.name, status: newStatus, version: participant.version + 1 });
 });
 

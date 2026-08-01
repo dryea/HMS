@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { logAudit } from './system';
 
 const app = new Hono<{ Bindings: { DB: D1Database } }>();
 function uid() { return crypto.randomUUID(); }
@@ -58,12 +59,14 @@ app.put('/:id', async (c) => {
 
 app.delete('/:id', async (c) => {
   const id = c.req.param('id');
+  const ev = await c.env.DB.prepare('SELECT name FROM events WHERE id=?').bind(id).first();
   await c.env.DB.prepare('DELETE FROM checkins WHERE event_id=?').bind(id).run();
   await c.env.DB.prepare('DELETE FROM participants WHERE event_id=?').bind(id).run();
   await c.env.DB.prepare('DELETE FROM beds WHERE room_id IN (SELECT id FROM rooms WHERE event_id=?)').bind(id).run();
   await c.env.DB.prepare('DELETE FROM rooms WHERE event_id=?').bind(id).run();
   await c.env.DB.prepare('DELETE FROM event_hotels WHERE event_id=?').bind(id).run();
   await c.env.DB.prepare('DELETE FROM events WHERE id=?').bind(id).run();
+  await logAudit(c.env.DB, id, 'delete', 'event', id, { name: ev?.name });
   return c.json({ ok: true });
 });
 

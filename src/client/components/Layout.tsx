@@ -1,11 +1,13 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useMantineColorScheme } from '@mantine/core';
-import { IconDoorExit, IconHome, IconBed, IconUsers, IconChartBar, IconCalendar, IconBuilding, IconSun, IconMoon } from '@tabler/icons-react';
+import { IconDoorExit, IconHome, IconBed, IconUsers, IconChartBar, IconCalendar, IconBuilding, IconSun, IconMoon, IconLanguage } from '@tabler/icons-react';
+import { useI18n } from '../hooks/useI18n';
 
 export default function Layout() {
   const nav = useNavigate();
   const loc = useLocation();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { t, toggleLang } = useI18n();
 
   const parts = loc.pathname.split('/');
   const eventIdx = parts.indexOf('events');
@@ -15,12 +17,12 @@ export default function Layout() {
   if (isStaff) return <Outlet />;
 
   const tabs = [
-    { label: 'Home', icon: IconHome, path: '/admin' },
-    { label: 'Sessions', icon: IconCalendar, path: eventId ? '/admin/events/' + eventId + '/sessions' : null },
-    { label: 'Rooms', icon: IconBed, path: eventId ? '/admin/events/' + eventId + '/rooms' : null },
-    { label: 'People', icon: IconUsers, path: eventId ? '/admin/events/' + eventId + '/participants' : null },
-    { label: 'Services', icon: IconBuilding, path: eventId ? '/admin/events/' + eventId + '/services' : null },
-    { label: 'Dash', icon: IconChartBar, path: eventId ? '/admin/events/' + eventId + '/dashboard' : null },
+    { label: t('home'), icon: IconHome, path: '/admin' },
+    { label: t('sessions'), icon: IconCalendar, path: eventId ? '/admin/events/' + eventId + '/sessions' : null },
+    { label: t('rooms'), icon: IconBed, path: eventId ? '/admin/events/' + eventId + '/rooms' : null },
+    { label: t('people'), icon: IconUsers, path: eventId ? '/admin/events/' + eventId + '/participants' : null },
+    { label: t('services'), icon: IconBuilding, path: eventId ? '/admin/events/' + eventId + '/services' : null },
+    { label: t('dash'), icon: IconChartBar, path: eventId ? '/admin/events/' + eventId + '/dashboard' : null },
   ];
 
   return (
@@ -29,6 +31,9 @@ export default function Layout() {
         <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }} onClick={() => nav('/admin')}>
           <span className="md3-title-large" style={{ color: 'var(--md-on-surface)' }}>SummitStay</span>
         </div>
+        <button className="md3-btn-text" onClick={toggleLang} style={{ minWidth: 40, padding: 8 }} title="Language">
+          <IconLanguage size={20} />
+        </button>
         <button className="md3-btn-text" onClick={toggleColorScheme} style={{ minWidth: 40, padding: 8 }} title="Toggle theme">
           {colorScheme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
         </button>
