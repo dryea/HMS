@@ -121,7 +121,7 @@ html, body, #root { height: 100%; margin: 0; padding: 0; }
 body {
   background: var(--md-background);
   color: var(--md-on-background);
-  font-family: Roboto, -apple-system, sans-serif;
+  font-family: 'Outfit', -apple-system, sans-serif;
   font-size: var(--md-typescale-body-medium-font-size);
   line-height: var(--md-typescale-body-medium-line-height);
   -webkit-tap-highlight-color: transparent;
@@ -554,9 +554,51 @@ tr td:last-child { border-radius: 0 var(--md-shape-md) var(--md-shape-md) 0; }
   --md-tertiary-container: #725C2F;
   --md-on-tertiary-container: #FEDDB2;
 }
-[data-mantine-color-scheme="dark"] .md3-card,
-[data-mantine-color-scheme="dark"] .md3-card-elevated { background: var(--md-surface-container-low); }
-[data-mantine-color-scheme="dark"] .md3-card-outlined { background: var(--md-surface); }
 [data-mantine-color-scheme="dark"] table td { background: var(--md-surface-container-low); }
 [data-mantine-color-scheme="dark"] .mantine-Table-td,
 [data-mantine-color-scheme="dark"] .mantine-Table-tr { background: var(--md-surface-container-low); }
+
+/* Glassmorphism Overrides */
+.md3-card, .md3-card-elevated, .md3-card-outlined {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+[data-mantine-color-scheme="dark"] .md3-card,
+[data-mantine-color-scheme="dark"] .md3-card-elevated,
+[data-mantine-color-scheme="dark"] .md3-card-outlined {
+  background: rgba(30, 30, 30, 0.6) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.md3-top-app-bar {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-mantine-color-scheme="dark"] .md3-top-app-bar {
+  background: rgba(20, 20, 20, 0.75) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.md3-nav-bar {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-mantine-color-scheme="dark"] .md3-nav-bar {
+  background: rgba(20, 20, 20, 0.75) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
