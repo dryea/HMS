@@ -12,7 +12,7 @@ app.post('/staff', async (c) => {
      FROM event_hotels eh
      JOIN events e ON e.id = eh.event_id
      JOIN hotels h ON h.id = eh.hotel_id
-     WHERE eh.code = ? AND e.is_active = 1`
+     WHERE LOWER(eh.code) = LOWER(?) AND e.is_active = 1`
   ).bind(code).first();
   if (!row) return c.json({ error: 'Invalid staff code' }, 401);
   return c.json({ token: uid(), event: { id: row.event_id, name: row.event_name, code: row.event_code, start_date: row.start_date, end_date: row.end_date }, hotel: { id: row.hotel_id, name: row.hotel_name, address: row.hotel_address } });
