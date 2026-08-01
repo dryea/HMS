@@ -19,11 +19,19 @@ export default function Login() {
   const lookupEvent = async () => {
     if(!eventCode) return; setLoading(true);
     try {
+      const codeTrimmed = eventCode.trim().toUpperCase();
+      if (codeTrimmed.includes('-')) {
+        const res = await api.auth.staff(codeTrimmed);
+        sessionStorage.setItem('staff_session', JSON.stringify(res));
+        nav('/staff/dashboard');
+        setLoading(false);
+        return;
+      }
       const res = (await fetch('/api/events').then(r=>r.json())) as any[];
-      const ev = res.find((e:any)=>e.event_code===eventCode.toUpperCase());
+      const ev = res.find((e:any)=>e.event_code===codeTrimmed);
       if(!ev||!ev.hotels?.length){notifications.show({title:'Error',message:'Event not found',color:'red'});setLoading(false);return;}
       setHotels(ev.hotels); setEventInfo(ev); setStep('hotel');
-    } catch { notifications.show({title:'Error',message:'Could not find event',color:'red'}); }
+    } catch(e:any) { notifications.show({title:'Error',message:e.message||'Could not find event',color:'red'}); }
     setLoading(false);
   };
 
