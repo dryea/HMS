@@ -1,94 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Container, Title, Text, Card, Group, Badge, Button, Stack, TextInput, Textarea, ActionIcon, Rating, Table, Tabs, Paper } from '@mantine/core';
-import { IconArrowLeft, IconArrowUp, IconCheck, IconMessage, IconStar } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { TextInput, Rating } from '@mantine/core';
+import { IconArrowLeft, IconMessage, IconStar } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
-import { motion } from 'framer-motion';
 
 export default function PortalSessionDetail() {
-  const { token, sid } = useParams();
-  const nav = useNavigate();
-  const [session, setSession] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [feedback, setFeedback] = useState<Record<string, any>>({});
-  const [tab, setTab] = useState<string|null>('info');
-
-  const load = async () => {
-    if(!token||!sid) return;
-    try { setSession(await (await fetch('/api/portal/'+token+'/sessions/'+sid)).json()); } catch {}
-    try { setQuestions(await (await fetch('/api/event-config/sessions/_/'+sid+'/questions')).json()); } catch {}
-  };
-  useEffect(() => { load(); }, [token, sid]);
-
-  const submitQuestion = async () => {
-    if(!newQuestion) return;
-    const p = session; // has participant context from session data
-    try {
-      await fetch('/api/portal/'+token+'/sessions/'+sid+'/questions', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:newQuestion})});
-      setNewQuestion(''); notifications.show({title:'Question submitted',color:'green'}); load();
-    } catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
-  };
-
-  const submitFeedback = async () => {
-    try {
-      await fetch('/api/event-config/sessions/_/'+sid+'/feedback', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:feedback.rating,comment:feedback.comment||''})});
-      notifications.show({title:'Feedback submitted',color:'green'}); load();
-    } catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
-  };
-
-  if(!session) return <Container><Text>Loading...</Text></Container>;
-
-  return (
-    <Container size="sm" py="md">
-      <Group mb="md"><ActionIcon variant="subtle" onClick={()=>nav(-1)}><IconArrowLeft size={20}/></ActionIcon><Title order={3}>{session.title}</Title></Group>
-      {session.subtitle && <Text c="dimmed" mb="md">{session.subtitle}</Text>}
-      
-      <Tabs value={tab} onChange={setTab}>
-        <Tabs.List grow mb="md">
-          <Tabs.Tab value="info">Info</Tabs.Tab>
-          <Tabs.Tab value="qa" leftSection={<IconMessage size={14}/>}>Q&A ({session.question_count||0})</Tabs.Tab>
-          <Tabs.Tab value="feedback" leftSection={<IconStar size={14}/>}>Feedback</Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="info">
-          {session.banner_image_url && <img src={session.banner_image_url} style={{width:'100%',borderRadius:8,marginBottom:12}} />}
-          <Text>{session.description}</Text>
-          <Group mt="md">
-            {session.speaker_name && <Badge size="lg">{session.speaker_name}</Badge>}
-            {session.location_name && <Badge size="lg" variant="light">{session.location_name}</Badge>}
-            <Badge size="lg" variant="outline">{session.start_time}-{session.end_time}</Badge>
-          </Group>
-          {session.speaker_bio && <Card withBorder mt="md" padding="sm"><Text size="sm">{session.speaker_bio}</Text></Card>}
-        </Tabs.Panel>
-
-        <Tabs.Panel value="qa">
-          <TextInput placeholder="Ask a question..." value={newQuestion} onChange={e=>setNewQuestion(e.target.value)} mb="md" />
-          <Button fullWidth onClick={submitQuestion} mb="md">Submit Question</Button>
-          {questions.map((q:any) => (
-            <Card key={q.id} withBorder mb="xs" padding="sm" radius="sm">
-              <Group justify="space-between">
-                <Text size="sm" style={{flex:1}}>{q.question}</Text>
-                {q.answered && <IconCheck size={14} color="green" />}
-              </Group>
-              <Group mt={4}>
-                <Badge size="xs" color={q.answered?'green':'gray'}>{q.answered?'Answered':'Open'}</Badge>
-                <Text size="xs" c="dimmed">{q.upvotes} upvotes</Text>
-              </Group>
-            </Card>
-          ))}
-        </Tabs.Panel>
-
-        <Tabs.Panel value="feedback">
-          <Card withBorder padding="md" radius="md">
-            <Text fw={500} mb="sm">Rate this session</Text>
-            <Rating value={feedback.rating||0} onChange={v=>setFeedback({...feedback,rating:v})} size="lg" mb="md" />
-            <Textarea placeholder="Any comments?" value={feedback.comment||''} onChange={e=>setFeedback({...feedback,comment:e.target.value})} mb="md" />
-            <Button onClick={submitFeedback} disabled={!feedback.rating}>Submit Feedback</Button>
-          </Card>
-        </Tabs.Panel>
-      </Tabs>
-    </Container>
-  );
+  const {token,sid}=useParams();const nav=useNavigate();
+  const [session,setSession]=useState<any>(null);const [questions,setQuestions]=useState<any[]>([]);
+  const [newQuestion,setNewQuestion]=useState('');const [feedback,setFeedback]=useState<Record<string,any>>({});
+  const [tab,setTab]=useState<string>('info');
+  const load=async()=>{if(!token||!sid)return;try{setSession(await(await fetch('/api/portal/'+token+'/sessions/'+sid)).json());}catch{}try{setQuestions(await(await fetch('/api/event-config/sessions/_/'+sid+'/questions')).json());}catch{}};
+  useEffect(()=>{load();},[token,sid]);
+  if(!session)return<div className="page-container"><p>Loading...</p></div>;
+  return(<div className="page-container" style={{maxWidth:480}}>
+    <div className="flex items-center gap-8 mb-20"><button className="md3-btn-text" onClick={()=>nav(-1)}><IconArrowLeft size={20}/></button><h1 className="md3-headline-small m-0">{session.title}</h1></div>
+    <div className="flex gap-4 mb-16" style={{background:'var(--md-surface-container-high)',borderRadius:9999,padding:4}}>
+      {['info','qa','feedback'].map(t=><button key={t} className="md3-chip" data-selected={tab===t} onClick={()=>setTab(t)} style={{flex:1,justifyContent:'center'}}>{t==='info'?'Info':t==='qa'?`Q&A (${session.question_count||0})`:'Feedback'}</button>)}
+    </div>
+    {tab==='info'&&<div>{session.description&&<p className="md3-body-medium">{session.description}</p>}<div className="flex gap-8 mt-12 flex-wrap">{session.speaker_name&&<span className="md3-chip" data-selected style={{cursor:'default'}}>{session.speaker_name}</span>}{session.location_name&&<span className="md3-chip" style={{cursor:'default'}}>{session.location_name}</span>}<span className="md3-chip" style={{cursor:'default'}}>{session.start_time}-{session.end_time}</span></div></div>}
+    {tab==='qa'&&<div><div className="flex gap-8 mb-12"><input className="md3-text-field" style={{flex:1,minHeight:44}} placeholder="Ask a question..." value={newQuestion} onChange={e=>setNewQuestion(e.target.value)} /><button className="md3-btn" onClick={async()=>{if(!newQuestion)return;try{await fetch('/api/portal/'+token+'/sessions/'+sid+'/questions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:newQuestion})});setNewQuestion('');load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Ask</button></div>
+      {questions.map((q:any)=>(<div key={q.id} className="md3-card p-12 mb-8"><p className="md3-body-medium">{q.question}</p><div className="flex gap-4 mt-4"><span className="md3-badge" style={{background:q.answered?'var(--md-tertiary)':'var(--md-surface-container-high)'}}>{q.answered?'Answered':'Open'}</span></div></div>))}</div>}
+    {tab==='feedback'&&<div className="md3-card p-20"><p className="md3-body-medium mb-8">Rate this session</p><Rating value={feedback.rating||0} onChange={v=>setFeedback({...feedback,rating:v})} size="lg" mb={12}/><input className="md3-text-field" style={{minHeight:44}} placeholder="Comments?" value={feedback.comment||''} onChange={e=>setFeedback({...feedback,comment:e.target.value})} /><button className="md3-btn mt-12" style={{width:'100%'}} disabled={!feedback.rating} onClick={async()=>{try{await fetch('/api/event-config/sessions/_/'+sid+'/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:feedback.rating,comment:feedback.comment||''})});notifications.show({title:'Feedback submitted',color:'green'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Submit</button></div>}
+  </div>);
 }

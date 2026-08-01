@@ -23,8 +23,8 @@ app.post('/', async (c) => {
   const hotelIds = b.hotel_ids || (b.hotel_id ? [b.hotel_id] : []);
   const primaryHotel = hotelIds[0] || null;
   await c.env.DB.prepare(
-    'INSERT INTO events (id,hotel_id,name,description,start_date,end_date,event_code) VALUES(?,?,?,?,?,?,?)'
-  ).bind(id, primaryHotel, b.name, n(b.description), b.start_date, b.end_date, code).run();
+    'INSERT INTO events (id,hotel_id,name,description,start_date,end_date,event_code,dress_code,program_type) VALUES(?,?,?,?,?,?,?,?,?)'
+  ).bind(id, primaryHotel, b.name, n(b.description), b.start_date, b.end_date, code, n(b.dress_code), n(b.program_type)).run();
   for (const hid of hotelIds) {
     const ehid = uid();
     await c.env.DB.prepare('INSERT INTO event_hotels (id,event_id,hotel_id) VALUES(?,?,?)').bind(ehid, id, hid).run();
@@ -51,8 +51,8 @@ app.get('/:id', async (c) => {
 
 app.put('/:id', async (c) => {
   const b = await c.req.json();
-  await c.env.DB.prepare('UPDATE events SET name=?,description=?,start_date=?,end_date=?,is_active=? WHERE id=?')
-    .bind(b.name, n(b.description), b.start_date, b.end_date, b.is_active??1, c.req.param('id')).run();
+  await c.env.DB.prepare('UPDATE events SET name=?,description=?,start_date=?,end_date=?,is_active=?,dress_code=?,program_type=? WHERE id=?')
+    .bind(b.name, n(b.description), b.start_date, b.end_date, b.is_active??1, n(b.dress_code), n(b.program_type), c.req.param('id')).run();
   return c.json({ ok: true });
 });
 

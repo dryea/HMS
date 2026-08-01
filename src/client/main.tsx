@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { MantineProvider, Button, Paper, Text, Group, Loader, Center } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { IconDeviceMobile } from '@tabler/icons-react';
-import { appTheme } from './theme';
+import { appTheme, md3Colors } from './theme';
 import ErrorBoundary from './components/ErrorBoundary';
 import NetworkBanner from './components/NetworkBanner';
 import '@mantine/core/styles.css';

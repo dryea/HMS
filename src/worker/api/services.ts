@@ -16,6 +16,7 @@ app.get('/:eid/dates', async (c) => {
   const byDate: Record<string, any> = {};
   for (const r of results) {
     if (!byDate[r.service_date]) byDate[r.service_date] = { date: r.service_date, services: [] };
+    if (r.menu_items) { try { r.menu_items = JSON.parse(r.menu_items); } catch { r.menu_items = []; } }
     byDate[r.service_date].services.push(r);
   }
   return c.json(Object.values(byDate));
@@ -23,12 +24,20 @@ app.get('/:eid/dates', async (c) => {
 
 app.post('/:eid/dates', async (c) => {
   const eid = c.req.param('eid');
-  const { date, services } = await c.req.json(); // services: [{hotel_id, type_id, start_time, end_time}]
+  const { date, services } = await c.req.json(); // services: [{hotel_id, type_id, start_time, end_time, menu_items}]
   for (const s of services) {
     await c.env.DB.prepare(
-      'INSERT OR REPLACE INTO event_date_services (id,event_id,hotel_id,service_date,service_type_id,start_time,end_time) VALUES(?,?,?,?,?,?,?)'
-    ).bind(uid(), eid, s.hotel_id, date, s.type_id, s.start_time||null, s.end_time||null).run();
+      'INSERT OR REPLACE INTO event_date_services (id,event_id,hotel_id,service_date,service_type_id,start_time,end_time,menu_items) VALUES(?,?,?,?,?,?,?,?)'
+    ).bind(uid(), eid, s.hotel_id, date, s.type_id, s.start_time||null, s.end_time||null, s.menu_items?JSON.stringify(s.menu_items):null).run();
   }
+  return c.json({ ok: true });
+});
+
+// Update menu items for a service
+app.put('/:eid/date-service/:dsId/menu', async (c) => {
+  const { menu_items } = await c.req.json();
+  await c.env.DB.prepare('UPDATE event_date_services SET menu_items=? WHERE id=?')
+    .bind(JSON.stringify(menu_items||[]), c.req.param('dsId')).run();
   return c.json({ ok: true });
 });
 

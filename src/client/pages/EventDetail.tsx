@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Title, Text, SimpleGrid, Card, Group, Button, Stack, Badge, ActionIcon, Tooltip } from '@mantine/core';
-import { IconBed, IconUsers, IconDoor, IconQrcode, IconBuilding, IconCopy, IconArrowRight, IconCalendar, IconMap, IconBell, IconClipboardCheck, IconPalette, IconBuildingStore, IconSettings } from '@tabler/icons-react';
+import { IconBuilding, IconCopy, IconArrowRight, IconCalendar, IconMap, IconBell, IconClipboardCheck, IconPalette, IconBuildingStore, IconSettings, IconDoor, IconUsers, IconQrcode, IconBed } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { api } from '../api/client';
-import Breadcrumbs from '../components/Breadcrumbs';
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -19,99 +17,92 @@ export default function EventDetail() {
   };
   useEffect(() => { load(); }, [id]);
 
-  if (!event) return <Container><Text>Loading...</Text></Container>;
+  if (!event) return <div className="page-container"><p>Loading...</p></div>;
 
   const copyCode = (code: string) => { navigator.clipboard.writeText(code); notifications.show({ title: 'Copied: ' + code, color: 'blue' }); };
   const openStaff = (code: string) => { window.open('/staff/' + code, '_blank'); };
 
+  const sections = [
+    { icon: IconCalendar, label: 'Program', path: 'program' },
+    { icon: IconCalendar, label: 'Schedule', path: 'schedule' },
+    { icon: IconCalendar, label: 'Sessions', path: 'sessions' },
+    { icon: IconMap, label: 'Locations', path: 'locations' },
+    { icon: IconBuildingStore, label: 'Services', path: 'services' },
+    { icon: IconDoor, label: 'Rooms', path: 'rooms' },
+    { icon: IconUsers, label: 'Participants', path: 'participants' },
+    { icon: IconQrcode, label: 'Dashboard', path: 'dashboard' },
+    { icon: IconBell, label: 'Announcements', path: 'announcements' },
+    { icon: IconClipboardCheck, label: 'Survey', path: 'survey' },
+    { icon: IconPalette, label: 'Branding', path: 'branding' },
+    { icon: IconSettings, label: 'Config', path: 'configure' },
+  ];
+
   return (
-    <Container pb={70}>
-      <Breadcrumbs items={[
-        { label: 'Super Admin', href: '/admin' },
-        { label: 'Events', href: '/admin/events' },
-        { label: event.name }
-      ]} />
-      <Group justify="space-between" mb="md">
-        <Title order={3}>{event.name}</Title>
-        <Group gap={4}>
-          <Button size="xs" variant="light" color="blue" onClick={() => nav('/admin/events/' + id + '/dashboard')}>Dashboard</Button>
-          <Button size="xs" variant="light" color="grape" onClick={() => nav('/admin/events/' + id + '/rooms')}>Rooms</Button>
-          <Button size="xs" variant="light" color="teal" onClick={() => nav('/admin/events/' + id + '/participants')}>Participants</Button>
-        </Group>
-      </Group>
-      <Text c="dimmed" size="sm">{event.description}</Text>
-      <Text size="xs" c="dimmed">{event.start_date} to {event.end_date}</Text>
-      <Badge mt="xs">{event.event_code}</Badge>
+    <div className="page-container">
+      <div className="flex items-center justify-between mb-16" style={{ flexWrap: 'wrap', gap: 8 }}>
+        <div>
+          <h1 className="md3-headline-small m-0">{event.name}</h1>
+          <p className="md3-body-medium m-0 mt-4" style={{ color: 'var(--md-on-surface-variant)' }}>{event.description} · {event.start_date} to {event.end_date}</p>
+        </div>
+        <span className="md3-badge">{event.event_code}</span>
+      </div>
 
-      <SimpleGrid cols={{ base: 2, sm: 3 }} mt="lg">
-        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('schedule')}>
-          <IconCalendar size={24} /><Text size="xl">-</Text><Text size="sm">Schedule</Text>
-        </Card>
-        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('sessions')}>
-          <IconCalendar size={24} /><Text size="xl">-</Text><Text size="sm">Sessions</Text>
-        </Card>
-        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('locations')}>
-          <IconMap size={24} /><Text size="xl">-</Text><Text size="sm">Locations</Text>
-        </Card>
-        <Card withBorder padding="md" radius="md" ta="center" style={{cursor:'pointer'}} onClick={() => nav('services')}>
-          <IconBuildingStore size={24} /><Text size="xl">-</Text><Text size="sm">Services</Text>
-        </Card>
-      </SimpleGrid>
+      <div className="stat-grid">
+        <div className="md3-card stat-card p-16" style={{cursor:'pointer'}} onClick={() => nav('dashboard')}>
+          <div className="stat-value">{stats.total||0}</div>
+          <div className="stat-label">Total</div>
+        </div>
+        <div className="md3-card stat-card p-16" style={{cursor:'pointer'}} onClick={() => nav('rooms')}>
+          <div className="stat-value">{stats.allocated||0}</div>
+          <div className="stat-label">Allocated</div>
+        </div>
+        <div className="md3-card stat-card p-16" style={{cursor:'pointer'}} onClick={() => nav('participants')}>
+          <div className="stat-value">{stats.checked_in||0}</div>
+          <div className="stat-label">Checked In</div>
+        </div>
+        <div className="md3-card stat-card p-16">
+          <div className="stat-value">{stats.arrived||0}</div>
+          <div className="stat-label">Arrived</div>
+        </div>
+      </div>
 
-      <SimpleGrid cols={{ base: 2, sm: 4 }} mt="lg">
-        <Card withBorder padding="md" radius="md" ta="center" onClick={() => nav('dashboard')}>
-          <Text size="xl">{stats.total||0}</Text><Text size="sm">Total</Text>
-        </Card>
-        <Card withBorder padding="md" radius="md" ta="center" onClick={() => nav('rooms')}>
-          <IconDoor size={24} /><Text size="xl">{stats.allocated||0}</Text><Text size="sm">Allocated</Text>
-        </Card>
-        <Card withBorder padding="md" radius="md" ta="center" onClick={() => nav('participants')}>
-          <IconUsers size={24} /><Text size="xl">{stats.checked_in||0}</Text><Text size="sm">Checked In</Text>
-        </Card>
-        <Card withBorder padding="md" radius="md" ta="center">
-          <IconBed size={24} /><Text size="xl">{stats.arrived||0}</Text><Text size="sm">Arrived</Text>
-        </Card>
-      </SimpleGrid>
-
+      <h2 className="md3-title-medium m-0 mb-12">Hotels</h2>
       {event.hotels?.map((h: any) => (
-        <Card key={h.id} withBorder mt="sm" padding="sm" radius="md">
-          <Group><IconBuilding size={18} /><Text fw={500}>{h.name}</Text></Group>
-          <Text size="xs" c="dimmed">{h.address}</Text>
-          <Group mt={4}>
+        <div key={h.id} className="md3-card p-16 mb-12">
+          <div className="flex items-center gap-12 mb-8">
+            <IconBuilding size={20} style={{ color: 'var(--md-primary)' }} />
+            <span className="md3-title-medium m-0">{h.name}</span>
+            <span className="md3-body-small" style={{ color: 'var(--md-on-surface-variant)' }}>{h.address}</span>
+          </div>
+          <div className="flex items-center gap-8 mb-12">
             {h.staff_code && (
               <>
-                <Badge size="sm" color="green" style={{cursor:'pointer'}} onClick={() => openStaff(h.staff_code)}>
+                <span className="md3-chip" style={{cursor:'pointer',background:'var(--md-primary-container)',borderColor:'transparent'}} onClick={() => openStaff(h.staff_code)}>
                   Staff: {h.staff_code}
-                </Badge>
-                <Tooltip label="Copy staff code">
-                  <ActionIcon size="xs" variant="subtle" onClick={() => copyCode(h.staff_code)}><IconCopy size={12} /></ActionIcon>
-                </Tooltip>
-                <Tooltip label="Open staff login">
-                  <ActionIcon size="xs" variant="subtle" onClick={() => openStaff(h.staff_code)}><IconArrowRight size={12} /></ActionIcon>
-                </Tooltip>
+                </span>
+                <button className="md3-btn-text" style={{height:32,minWidth:32,padding:'0 8px'}} onClick={() => copyCode(h.staff_code)} title="Copy"><IconCopy size={14} /></button>
               </>
             )}
-          </Group>
-          <Group mt="sm">
-            <Button size="xs" variant="light" color="grape" onClick={() => nav('hotels/' + h.id + '/rooms')}>Rooms</Button>
-            <Button size="xs" variant="light" color="teal" onClick={() => nav('hotels/' + h.id + '/participants')}>Participants</Button>
-          </Group>
-        </Card>
+          </div>
+          <div className="flex gap-8">
+            <button className="md3-btn-outlined" style={{height:32,padding:'0 16px'}} onClick={() => nav('hotels/' + h.id + '/rooms')}>Rooms</button>
+            <button className="md3-btn-outlined" style={{height:32,padding:'0 16px'}} onClick={() => nav('hotels/' + h.id + '/participants')}>Participants</button>
+          </div>
+        </div>
       ))}
 
-      <Stack mt="lg">
-        <Button leftSection={<IconCalendar size={20} />} onClick={() => nav('schedule')} fullWidth variant="light">Schedule Planner</Button>
-        <Button leftSection={<IconSettings size={20} />} onClick={() => nav('configure')} fullWidth variant="light">Event Config</Button>
-        <Button leftSection={<IconCalendar size={20} />} onClick={() => nav('sessions')} fullWidth variant="light">Program Sessions</Button>
-        <Button leftSection={<IconMap size={20} />} onClick={() => nav('locations')} fullWidth variant="light">Locations & Venues</Button>
-        <Button leftSection={<IconBuildingStore size={20} />} onClick={() => nav('services')} fullWidth variant="light">Service Schedule</Button>
-        <Button leftSection={<IconBell size={20} />} onClick={() => nav('announcements')} fullWidth variant="light">Announcements</Button>
-        <Button leftSection={<IconClipboardCheck size={20} />} onClick={() => nav('survey')} fullWidth variant="light">Survey</Button>
-        <Button leftSection={<IconPalette size={20} />} onClick={() => nav('branding')} fullWidth variant="light">Event Branding</Button>
-        <Button leftSection={<IconDoor size={20} />} onClick={() => nav('rooms')} fullWidth variant="light">All Rooms & Beds</Button>
-        <Button leftSection={<IconUsers size={20} />} onClick={() => nav('participants')} fullWidth variant="light">All Participants</Button>
-        <Button leftSection={<IconQrcode size={20} />} onClick={() => nav('dashboard')} fullWidth variant="light">Dashboard & QR</Button>
-      </Stack>
-    </Container>
+      <h2 className="md3-title-medium m-0 mb-12 mt-24">Quick Links</h2>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12}}>
+        {sections.map(s => {
+          const Icon = s.icon;
+          return (
+            <div key={s.path} className="md3-card p-16" style={{cursor:'pointer', textAlign:'center'}} onClick={() => nav(s.path)}>
+              <Icon size={24} style={{ color: 'var(--md-primary)', marginBottom: 8 }} />
+              <div className="md3-label-medium">{s.label}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

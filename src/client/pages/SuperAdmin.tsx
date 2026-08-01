@@ -1,14 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Title, SimpleGrid, Card, Text, Group, Button, Table, Badge, Stack, Skeleton } from '@mantine/core';
 import { IconBuilding, IconCalendar, IconUsers, IconCheck, IconPlus, IconRefresh } from '@tabler/icons-react';
-import { motion } from 'framer-motion';
 import { api } from '../api/client';
-import Breadcrumbs from '../components/Breadcrumbs';
-import AnimatedCounter from '../components/AnimatedCounter';
-import EmptyState from '../components/EmptyState';
-
-const MotionCard = motion.create(Card);
+import { Skeleton } from '@mantine/core';
 
 export default function SuperAdmin() {
   const nav = useNavigate();
@@ -18,66 +12,71 @@ export default function SuperAdmin() {
   useEffect(() => { load(); }, []);
 
   if (loading) return (
-    <Container pb={70}><Breadcrumbs items={[{label:'Super Admin'}]} /><Title order={3} mb="md"><Skeleton height={28} width={200} /></Title>
-      <SimpleGrid cols={{base:2,sm:4}} mb="lg">
-        {[1,2,3,4].map(i => <Skeleton key={i} height={100} radius="md" />)}
-      </SimpleGrid>
-      <Skeleton height={200} radius="md" />
-    </Container>
+    <div className="page-container">
+      <div className="stat-grid">
+        {[1,2,3,4].map(i => <Skeleton key={i} height={96} radius={16} />)}
+      </div>
+    </div>
   );
 
   if (!data || !data.total_events) return (
-    <Container pb={70}>
-      <Breadcrumbs items={[{label:'Super Admin'}]} />
-      <EmptyState icon={<IconCalendar size={64} />} title="No events yet"
-        description="Create your first event to start managing hotels, rooms, and participants."
-        actionLabel="Create Event" onAction={() => nav('/admin/events')} />
-    </Container>
+    <div className="page-container">
+      <div className="md3-card p-24" style={{ textAlign: 'center' }}>
+        <IconCalendar size={48} style={{ opacity: 0.3, marginBottom: 16 }} />
+        <h2 className="md3-title-large m-0 mb-8">No events yet</h2>
+        <p className="md3-body-medium m-0 mb-16" style={{ color: 'var(--md-on-surface-variant)' }}>Create your first event to get started.</p>
+        <button className="md3-btn" onClick={() => nav('/admin/events')}>Create Event</button>
+      </div>
+    </div>
   );
 
   return (
-    <Container pb={70}>
-      <Breadcrumbs items={[{ label: 'Super Admin' }]} />
-      <Group justify="space-between" mb="md">
-        <Title order={3}>Overview</Title>
-        <Group>
-          <Button size="xs" variant="light" leftSection={<IconRefresh size={14} />} onClick={load}>Refresh</Button>
-          <Button size="xs" leftSection={<IconPlus size={14} />} onClick={() => nav('/admin/events')}>New Event</Button>
-        </Group>
-      </Group>
-      <SimpleGrid cols={{base:2,sm:4}} mb="lg">
-        {[
-          { icon: IconBuilding, value: data.total_hotels, label: 'Hotels', color: 'blue' },
-          { icon: IconCalendar, value: data.total_events, label: 'Events', color: 'grape' },
-          { icon: IconUsers, value: data.total_participants, label: 'Participants', color: 'teal' },
-          { icon: IconCheck, value: data.active_checkins, label: 'Checked In', color: 'green' },
-        ].map((item, i) => (
-          <MotionCard key={item.label} withBorder padding="md" radius="md" ta="center"
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <item.icon size={24} />
-            <AnimatedCounter value={item.value} />
-            <Text size="xs" c="dimmed">{item.label}</Text>
-          </MotionCard>
-        ))}
-      </SimpleGrid>
-
-      <Title order={4} mb="sm">All Events</Title>
-      <div className="table-scroll">
-      <Table>
-        <Table.Thead><Table.Tr><Table.Th className="sticky-col">Event</Table.Th><Table.Th>Dates</Table.Th><Table.Th>Parts</Table.Th><Table.Th>Rooms</Table.Th><Table.Th>Actions</Table.Th></Table.Tr></Table.Thead>
-        <Table.Tbody>
-          {(data.events||[]).map((e:any) => (
-            <Table.Tr key={e.id} style={{cursor:'pointer'}} onClick={() => nav('/admin/events/'+e.id)}>
-              <Table.Td className="sticky-col"><Text fw={500}>{e.name}</Text><Badge size="xs">{e.event_code}</Badge></Table.Td>
-              <Table.Td><Text size="sm">{e.start_date} to {e.end_date}</Text></Table.Td>
-              <Table.Td>{e.participants||0}</Table.Td>
-              <Table.Td>{e.rooms||0}</Table.Td>
-              <Table.Td><Button size="xs" variant="light" color="blue" onClick={(ev) => { ev.stopPropagation(); nav('/admin/events/'+e.id+'/dashboard'); }}>Dash</Button></Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+    <div className="page-container">
+      <div className="flex items-center justify-between mb-24">
+        <h1 className="md3-headline-small m-0">Overview</h1>
+        <div className="flex gap-8">
+          <button className="md3-btn-text" onClick={load}><IconRefresh size={18} /> Refresh</button>
+          <button className="md3-btn" onClick={() => nav('/admin/events')}><IconPlus size={18} /> New Event</button>
+        </div>
       </div>
-    </Container>
+
+      <div className="stat-grid">
+        {[
+          { icon: IconBuilding, value: data.total_hotels, label: 'Hotels' },
+          { icon: IconCalendar, value: data.total_events, label: 'Events' },
+          { icon: IconUsers, value: data.total_participants, label: 'Participants' },
+          { icon: IconCheck, value: data.active_checkins, label: 'Checked In' },
+        ].map((item) => (
+          <div key={item.label} className="md3-card stat-card p-20">
+            <item.icon size={24} style={{ color: 'var(--md-primary)', marginBottom: 8 }} />
+            <div className="stat-value">{item.value}</div>
+            <div className="stat-label">{item.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="md3-title-large m-0 mb-16">All Events</h2>
+
+      <div className="flex flex-col gap-12">
+        {(data.events||[]).map((e:any) => (
+          <div key={e.id} className="md3-card p-16" style={{ cursor: 'pointer' }} onClick={() => nav('/admin/events/'+e.id)}>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-12">
+                <IconCalendar size={20} style={{ color: 'var(--md-primary)' }} />
+                <h3 className="md3-title-medium m-0">{e.name}</h3>
+                <span className="md3-badge">{e.event_code}</span>
+              </div>
+              <div className="flex items-center gap-8">
+                <span className="md3-body-small" style={{ color: 'var(--md-on-surface-variant)' }}>{e.start_date} to {e.end_date}</span>
+              </div>
+            </div>
+            <div className="flex gap-24">
+              <span className="md3-body-small" style={{ color: 'var(--md-on-surface-variant)' }}><IconUsers size={14} style={{verticalAlign:'middle',marginRight:4}} />{e.participants||0} participants</span>
+              <span className="md3-body-small" style={{ color: 'var(--md-on-surface-variant)' }}><IconBuilding size={14} style={{verticalAlign:'middle',marginRight:4}} />{e.rooms||0} rooms</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

@@ -1,39 +1,56 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { AppShell, Group, Title, Text, ActionIcon } from '@mantine/core';
-import { IconDoorExit } from '@tabler/icons-react';
-import TabBar from './TabBar';
-import ThemeProvider from './ThemeProvider';
+import { IconDoorExit, IconHome, IconBed, IconUsers, IconChartBar, IconCalendar, IconBuilding } from '@tabler/icons-react';
 
 export default function Layout() {
   const nav = useNavigate();
   const loc = useLocation();
 
-  // Extract eventId from path if present
   const parts = loc.pathname.split('/');
   const eventIdx = parts.indexOf('events');
   const eventId = eventIdx > 0 && eventIdx + 1 < parts.length ? parts[eventIdx + 1] : undefined;
 
+  const isStaff = loc.pathname.startsWith('/staff');
+  if (isStaff) return <Outlet />;
+
+  const tabs = [
+    { label: 'Home', icon: IconHome, path: '/admin' },
+    { label: 'Sessions', icon: IconCalendar, path: eventId ? '/admin/events/' + eventId + '/sessions' : null },
+    { label: 'Rooms', icon: IconBed, path: eventId ? '/admin/events/' + eventId + '/rooms' : null },
+    { label: 'People', icon: IconUsers, path: eventId ? '/admin/events/' + eventId + '/participants' : null },
+    { label: 'Services', icon: IconBuilding, path: eventId ? '/admin/events/' + eventId + '/services' : null },
+    { label: 'Dash', icon: IconChartBar, path: eventId ? '/admin/events/' + eventId + '/dashboard' : null },
+  ];
+
   return (
-    <AppShell header={{ height: 56 }} padding="md" pb={70} style={{ background: '#EBB8B6' }}>
-      <AppShell.Header style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
-        <Group h="100%" px="md" justify="space-between">
-          <Group style={{ cursor: 'pointer' }} onClick={() => nav('/admin')}>
-            <Title order={4} style={{ fontFamily: 'Playfair Display, serif', color: '#23262A' }}>HMS</Title>
-          </Group>
-          <Group>
-            <Text size="sm" c="#717680">Admin</Text>
-            <ActionIcon variant="subtle" color="dark" onClick={() => nav('/')}>
-              <IconDoorExit size={18} />
-            </ActionIcon>
-          </Group>
-        </Group>
-      </AppShell.Header>
-      <AppShell.Main>
-        <ThemeProvider eventId={eventId}>
-          <Outlet context={{ eventId }} />
-        </ThemeProvider>
-      </AppShell.Main>
-      <TabBar eventId={eventId} />
-    </AppShell>
+    <div style={{ background: 'var(--md-background)', minHeight: '100vh', paddingBottom: 96 }}>
+      <header className="md3-top-app-bar">
+        <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flex: 1 }} onClick={() => nav('/admin')}>
+          <span className="md3-title-large" style={{ color: 'var(--md-on-surface)' }}>HMS</span>
+        </div>
+        <button className="md3-btn-text" onClick={() => nav('/')} style={{ minWidth: 40, padding: 8 }}>
+          <IconDoorExit size={20} />
+        </button>
+      </header>
+
+      <main>
+        <Outlet context={{ eventId }} />
+      </main>
+
+      <nav className="md3-nav-bar">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = tab.path === '/admin' ? loc.pathname === '/admin' : (tab.path && loc.pathname.startsWith(tab.path));
+          return (
+            <button key={tab.label} className="md3-nav-item" data-active={active || undefined}
+              onClick={() => tab.path && nav(tab.path)}
+              disabled={!tab.path}
+              style={{ opacity: tab.path ? 1 : 0.4 }}>
+              <Icon size={24} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

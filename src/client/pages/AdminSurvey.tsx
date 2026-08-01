@@ -1,89 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Title, Group, Button, Stack, TextInput, Text, Card, Badge, Switch, Table, ActionIcon } from '@mantine/core';
+import { TextInput, Card, Badge, Switch, Group, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconChartBar } from '@tabler/icons-react';
-import Breadcrumbs from '../components/Breadcrumbs';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 
 export default function AdminSurvey() {
-  const { id: eventId } = useParams();
-  const [survey, setSurvey] = useState<any>(null);
-  const [responses, setResponses] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [active, setActive] = useState(false);
-  const [event, setEvent] = useState<any>(null);
-
-  const load = async () => {
-    if (!eventId) return;
-    try {
-      const s = await (await fetch('/api/surveys/'+eventId)).json();
-      setSurvey(s.id ? s : null);
-      setQuestions(s.questions ? (typeof s.questions === 'string' ? JSON.parse(s.questions) : s.questions) : []);
-      setActive(s.active ? true : false);
-    } catch {}
-    try { const r = await (await fetch('/api/surveys/'+eventId+'/responses')).json(); setResponses(r); } catch {}
-    try { setEvent(await (await fetch('/api/events/'+eventId)).json()); } catch {}
-  };
-  useEffect(() => { load(); }, [eventId]);
-
-  const addQuestion = () => setQuestions([...questions, { id: 'q'+Date.now(), question: '', type: 'rating', options: [] }]);
-
-  const save = async () => {
-    try {
-      await fetch('/api/surveys/'+eventId, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ questions, active }) });
-      notifications.show({ title: 'Survey saved', color:'green' }); load();
-    } catch(e:any) { notifications.show({ title:'Error', message:e.message, color:'red' }); }
-  };
-
-  return (
-    <Container pb={70}>
-      <Breadcrumbs items={[
-        {label:'Super Admin',href:'/admin'},{label:'Events',href:'/admin/events'},{label:event?.name||'',href:'/admin/events/'+eventId},{label:'Survey'}
-      ]} />
-      <Title order={3} mb="md">Post-Event Survey</Title>
-      <Switch label="Survey Active" checked={active} onChange={e=>setActive(e.currentTarget.checked)} mb="md" />
-
-      {questions.map((q:any, i:number) => (
-        <Card key={q.id} withBorder mb="sm" padding="sm" radius="md">
-          <Group mb={4}>
-            <Text size="sm" fw={500}>Q{i+1}</Text>
-            <select value={q.type} onChange={e=>{const qs=[...questions]; qs[i].type=e.target.value; setQuestions(qs);}}>
-              <option value="rating">Rating (1-5)</option><option value="text">Text</option><option value="choice">Multiple Choice</option>
-            </select>
-            <ActionIcon size="sm" color="red" variant="subtle" onClick={() => setQuestions(questions.filter((_:any,idx:number)=>idx!==i))}><IconTrash size={14} /></ActionIcon>
-          </Group>
-          <TextInput placeholder="Question" value={q.question} onChange={e=>{const qs=[...questions]; qs[i].question=e.target.value; setQuestions(qs);}} />
-          {q.type === 'choice' && (
-            <TextInput mt={4} placeholder="Options (comma separated)" value={q.options?.join(',')||''}
-              onChange={e=>{const qs=[...questions]; qs[i].options=e.target.value.split(',').map((s:string)=>s.trim()); setQuestions(qs);}} />
-          )}
-        </Card>
-      ))}
-      <Group mb="md">
-        <Button variant="light" leftSection={<IconPlus size={14} />} onClick={addQuestion}>Add Question</Button>
-        <Button onClick={save}>Save Survey</Button>
-      </Group>
-
-      {responses?.analytics && Object.keys(responses.analytics).length > 0 && (
-        <Card withBorder padding="md" radius="md">
-          <Title order={5} mb="sm">Results ({responses.total} responses)</Title>
-          {Object.values(responses.analytics).map((a: any) => (
-            <Stack key={a.question} gap={4} mb="md">
-              <Text size="sm" fw={500}>{a.question}</Text>
-              {a.type === 'rating' && (
-                <Group gap={8}>
-                  {[1,2,3,4,5].map(n => (
-                    <Badge key={n} size="lg" variant="light">{n}: {a.counts[String(n)]||0}</Badge>
-                  ))}
-                </Group>
-              )}
-              {a.type === 'choice' && Object.entries(a.counts).map(([opt, cnt]:[string,any]) => (
-                <Text key={opt} size="sm">{opt}: {cnt}</Text>
-              ))}
-            </Stack>
-          ))}
-        </Card>
-      )}
-    </Container>
-  );
+  const {id:eventId}=useParams();
+  const [survey,setSurvey]=useState<any>(null);
+  const [responses,setResponses]=useState<any>(null);
+  const [questions,setQuestions]=useState<any[]>([]);
+  const [active,setActive]=useState(false);
+  const load=async()=>{if(!eventId)return;try{const s=await(await fetch('/api/surveys/'+eventId)).json();setSurvey(s.id?s:null);setQuestions(s.questions?(typeof s.questions==='string'?JSON.parse(s.questions):s.questions):[]);setActive(s.active?true:false);}catch{}try{const r=await(await fetch('/api/surveys/'+eventId+'/responses')).json();setResponses(r);}catch{}};
+  useEffect(()=>{load();},[eventId]);
+  const save=async()=>{try{await fetch('/api/surveys/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions,active})});notifications.show({title:'Survey saved',color:'green'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  return(<div className="page-container">
+    <h1 className="md3-headline-small m-0 mb-20">Post-Event Survey</h1>
+    <div className="flex items-center gap-12 mb-20"><Switch label="Survey Active" checked={active} onChange={e=>setActive(e.currentTarget.checked)} /></div>
+    {questions.map((q:any,i:number)=>(<div key={q.id} className="md3-card p-16 mb-12">
+      <div className="flex items-center gap-8 mb-8"><span className="md3-label-large">Q{i+1}</span>
+        <select value={q.type} onChange={e=>{const qs=[...questions];qs[i].type=e.target.value;setQuestions(qs);}} style={{padding:'4px 8px',borderRadius:8,border:'1px solid var(--md-outline-variant)',background:'var(--md-surface-container-high)'}}>
+          <option value="rating">Rating (1-5)</option><option value="text">Text</option><option value="choice">Multiple Choice</option></select>
+        <button className="md3-btn-text" style={{height:28,minWidth:28,padding:0,color:'var(--md-error)',marginLeft:'auto'}} onClick={()=>setQuestions(questions.filter((_:any,idx:number)=>idx!==i))}><IconTrash size={14}/></button>
+      </div>
+      <TextInput placeholder="Question" value={q.question} onChange={e=>{const qs=[...questions];qs[i].question=e.target.value;setQuestions(qs);}} />
+      {q.type==='choice'&&<TextInput mt={4} placeholder="Options (comma separated)" value={q.options?.join(',')||''} onChange={e=>{const qs=[...questions];qs[i].options=e.target.value.split(',').map((s:string)=>s.trim());setQuestions(qs);}} />}
+    </div>))}
+    <div className="flex gap-8 mb-20"><button className="md3-btn-text" onClick={()=>setQuestions([...questions,{id:'q'+Date.now(),question:'',type:'rating',options:[]}])}><IconPlus size={18}/> Add Question</button><button className="md3-btn" onClick={save}>Save Survey</button></div>
+    {responses?.analytics&&Object.keys(responses.analytics).length>0&&(<div className="md3-card p-20"><h3 className="md3-title-medium m-0 mb-12">Results ({responses.total} responses)</h3>
+      {Object.values(responses.analytics).map((a:any)=>(<div key={a.question} className="mb-12"><p className="md3-body-medium" style={{fontWeight:500}}>{a.question}</p>
+        {a.type==='rating'&&<div className="flex gap-8">{[1,2,3,4,5].map(n=><span key={n} className="md3-badge" style={{background:'var(--md-primary-container)',color:'var(--md-on-primary-container)'}}>{n}: {a.counts[String(n)]||0}</span>)}</div>}
+      </div>))}
+    </div>)}
+  </div>);
 }
