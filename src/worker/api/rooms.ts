@@ -12,7 +12,7 @@ app.get('/event/:eventId', async (c) => {
     'SELECT b.*, p.name as participant_name, p.id as pid FROM beds b LEFT JOIN participants p ON p.bed_id=b.id WHERE b.room_id IN (SELECT id FROM rooms WHERE event_id=?) ORDER BY b.label'
   ).bind(eid).all();
   const bedMap: Record<string, any[]> = {};
-  for (const b of beds.results) {
+  for (const b of beds.results as any[]) {
     if (!bedMap[b.room_id]) bedMap[b.room_id] = [];
     bedMap[b.room_id].push(b);
   }
@@ -29,7 +29,7 @@ app.get('/event/:eventId/hotel/:hotelId', async (c) => {
     'SELECT b.*, p.name as participant_name, p.id as pid FROM beds b LEFT JOIN participants p ON p.bed_id=b.id WHERE b.room_id IN (SELECT id FROM rooms WHERE event_id=? AND hotel_id=?) ORDER BY b.label'
   ).bind(eid, hid).all();
   const bedMap: Record<string, any[]> = {};
-  for (const b of beds.results) {
+  for (const b of beds.results as any[]) {
     if (!bedMap[b.room_id]) bedMap[b.room_id] = [];
     bedMap[b.room_id].push(b);
   }

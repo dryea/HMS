@@ -81,7 +81,7 @@ export default function HotelRooms() {
           <TextInput label="Floor" value={editForm.floor} onChange={e=>setEditForm({...editForm,floor:e.target.value})} />
           <TextInput label="Wing" value={editForm.wing} onChange={e=>setEditForm({...editForm,wing:e.target.value})} />
           <Select label="Status" data={[{value:'ready',label:'Ready'},{value:'occupied',label:'Occupied'},{value:'maintenance',label:'Maintenance'}]} value={editForm.status} onChange={v=>setEditForm({...editForm,status:v||'ready'})} />
-          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await fetch('/api/rooms/'+editRoom.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(editForm)});notifications.show({title:'Room updated',color:'green'});closeEdit();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Save</button>
+          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await fetch('/api/rooms/'+editRoom.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(editForm)});notifications.show({title:'Room updated',message:'The room has been updated.',color:'green'});closeEdit();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Save</button>
         </div>
       </Modal>
 
@@ -92,13 +92,13 @@ export default function HotelRooms() {
           <NumberInput label="Rooms/Floor" value={gen.rooms_per_floor} onChange={v=>setGen({...gen,rooms_per_floor:Number(v)})} min={1} />
           <NumberInput label="Beds/Room" value={gen.beds_per_room} onChange={v=>setGen({...gen,beds_per_room:Number(v)})} min={1} />
           <TextInput label="Prefix" value={gen.room_prefix} onChange={e=>setGen({...gen,room_prefix:e.target.value})} />
-          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await api.rooms.generate({event_id:eventId,hotel_id:hotelId,...gen});notifications.show({title:'Rooms created',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Generate</button>
+          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await api.rooms.generate({event_id:eventId,hotel_id:hotelId,...gen});notifications.show({title:'Rooms created',message:'Rooms have been generated successfully.',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Generate</button>
         </div>
       </Modal>
 
       <Modal opened={!!assignModal} onClose={()=>setAssignModal(null)} title="Assign Bed" centered>
         <div className="flex flex-col gap-8">
-          {unassigned.map((p:any)=><button key={p.id} className="md3-btn-text" style={{width:'100%',justifyContent:'flex-start'}} onClick={async()=>{try{await api.participants.assignBed(p.id,assignModal!);notifications.show({title:'Assigned',color:'green'});setAssignModal(null);load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>{p.name}</button>)}
+          {unassigned.map((p:any)=><button key={p.id} className="md3-btn-text" style={{width:'100%',justifyContent:'flex-start'}} onClick={async()=>{try{await api.participants.assignBed(p.id,assignModal!);notifications.show({title:'Assigned',message:'Participant assigned to bed.',color:'green'});setAssignModal(null);load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>{p.name}</button>)}
           {unassigned.length===0&&<p className="md3-body-medium" style={{color:'var(--md-on-surface-variant)'}}>No unassigned participants</p>}
         </div>
       </Modal>

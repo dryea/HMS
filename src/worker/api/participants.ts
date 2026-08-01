@@ -83,7 +83,7 @@ app.put('/:id/unassign-bed', async (c) => {
 });
 
 app.delete('/:id', async (c) => {
-  const p = await c.env.DB.prepare('SELECT event_id,name FROM participants WHERE id=?').bind(c.req.param('id')).first();
+  const p = (await c.env.DB.prepare('SELECT event_id,name FROM participants WHERE id=?').bind(c.req.param('id')).first()) as any;
   await c.env.DB.prepare('DELETE FROM participants WHERE id=?').bind(c.req.param('id')).run();
   await logAudit(c.env.DB, p?.event_id, 'delete', 'participant', c.req.param('id'), { name: p?.name });
   return c.json({ ok: true });

@@ -19,7 +19,7 @@ export default function Login() {
   const lookupEvent = async () => {
     if(!eventCode) return; setLoading(true);
     try {
-      const res = await fetch('/api/events').then(r=>r.json());
+      const res = (await fetch('/api/events').then(r=>r.json())) as any[];
       const ev = res.find((e:any)=>e.event_code===eventCode.toUpperCase());
       if(!ev||!ev.hotels?.length){notifications.show({title:'Error',message:'Event not found',color:'red'});setLoading(false);return;}
       setHotels(ev.hotels); setEventInfo(ev); setStep('hotel');

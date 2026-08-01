@@ -19,7 +19,7 @@ export default function EventDetail() {
 
   if (!event) return <div className="page-container"><p>Loading...</p></div>;
 
-  const copyCode = (code: string) => { navigator.clipboard.writeText(code); notifications.show({ title: 'Copied: ' + code, color: 'blue' }); };
+  const copyCode = (code: string) => { navigator.clipboard.writeText(code); notifications.show({ title: 'Copied', message: 'Staff login code ' + code + ' copied to clipboard.', color: 'blue' }); };
   const openStaff = (code: string) => { window.open('/staff/' + code, '_blank'); };
 
   const sections = [

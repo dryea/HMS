@@ -23,10 +23,10 @@ export default function AdminProgram() {
 
   const load=async()=>{
     if(!eventId)return;
-    try{const ev=await(await fetch('/api/events/'+eventId)).json();setEvent(ev);const start=new Date(ev.start_date),end=new Date(ev.end_date),ds:string[]=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1))ds.push(d.toISOString().split('T')[0]);setDates(ds);if(!activeDate&&ds.length)setActiveDate(ds[0]);}catch{}
-    try{setSessions(await(await fetch('/api/sessions/'+eventId)).json());}catch{}
-    try{setLocations(await(await fetch('/api/locations/'+eventId)).json());}catch{}
-    try{setServices(await(await fetch('/api/services/'+eventId+'/dates')).json());}catch{}
+    try{const ev: any = await(await fetch('/api/events/'+eventId)).json();setEvent(ev);const start=new Date(ev.start_date),end=new Date(ev.end_date),ds:string[]=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1))ds.push(d.toISOString().split('T')[0]);setDates(ds);if(!activeDate&&ds.length)setActiveDate(ds[0]);}catch{}
+    try{setSessions((await(await fetch('/api/sessions/'+eventId)).json()) as any[]);}catch{}
+    try{setLocations((await(await fetch('/api/locations/'+eventId)).json()) as any[]);}catch{}
+    try{setServices((await(await fetch('/api/services/'+eventId+'/dates')).json()) as any[]);}catch{}
   };
   useEffect(()=>{load();},[eventId]);
 
@@ -40,7 +40,7 @@ export default function AdminProgram() {
     try{
       if(editId){await fetch('/api/sessions/'+eventId+'/'+editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}
       else{await fetch('/api/sessions/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}
-      notifications.show({title:editId?'Updated':'Created',color:'green'});close();setEditId(null);load();
+      notifications.show({title:editId?'Updated':'Created',message:editId?'Session details updated':'New session created',color:'green'});close();setEditId(null);load();
     }catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
   };
 

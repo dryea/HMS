@@ -12,9 +12,9 @@ export default function AdminSessions() {
   const [opened,{open,close}]=useDisclosure(false);
   const [editId,setEditId]=useState<string|null>(null);
   const [form,setForm]=useState({title:'',description:'',speaker_name:'',speaker_title:'',location_id:'',session_date:'',start_time:'',end_time:'',track:''});
-  const load=async()=>{if(!eventId)return;try{setSessions(await(await fetch('/api/sessions/'+eventId)).json());}catch{}try{setLocations(await(await fetch('/api/locations/'+eventId)).json());}catch{}};
+  const load=async()=>{if(!eventId)return;try{setSessions((await(await fetch('/api/sessions/'+eventId)).json()) as any[]);}catch{}try{setLocations((await(await fetch('/api/locations/'+eventId)).json()) as any[]);}catch{}};
   useEffect(()=>{load();},[eventId]);
-  const save=async()=>{try{if(editId){await fetch('/api/sessions/'+eventId+'/'+editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});}else{await fetch('/api/sessions/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});}notifications.show({title:editId?'Updated':'Created',color:'green'});close();setEditId(null);load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const save=async()=>{try{if(editId){await fetch('/api/sessions/'+eventId+'/'+editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});}else{await fetch('/api/sessions/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});}notifications.show({title:editId?'Updated':'Created',message:editId?'Session details updated':'New session created',color:'green'});close();setEditId(null);load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
   return(<div className="page-container">
     <div className="flex items-center justify-between mb-20"><h1 className="md3-headline-small m-0">Sessions</h1><button className="md3-btn" onClick={()=>{setEditId(null);setForm({title:'',description:'',speaker_name:'',speaker_title:'',location_id:'',session_date:'',start_time:'',end_time:'',track:''});open();}}><IconPlus size={18}/> Add</button></div>
     <div style={{overflowX:'auto'}}><table><thead><tr><th>Date</th><th>Time</th><th>Title</th><th>Speaker</th><th>Location</th><th>Actions</th></tr></thead><tbody>

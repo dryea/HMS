@@ -38,9 +38,9 @@ app.post('/scan', async (c) => {
   const ip = c.req.header('cf-connecting-ip') || 'unknown';
   if (!rateLimit(ip)) return c.json({ error: 'Too many scans. Please slow down.' }, 429);
   const { qr_token, checked_by, hotel_id, expected_version } = await c.req.json();
-  const participant = await c.env.DB.prepare(
+  const participant = (await c.env.DB.prepare(
     'SELECT p.id, p.event_id, p.name, p.status, p.hotel_id, p.version, e.end_date FROM participants p JOIN events e ON e.id=p.event_id WHERE p.qr_token=?'
-  ).bind(qr_token).first();
+  ).bind(qr_token).first()) as any;
   if (!participant) return c.json({ error: 'Invalid QR' }, 404);
   // QR expiry check
   if (participant.end_date && new Date(participant.end_date) < new Date()) {

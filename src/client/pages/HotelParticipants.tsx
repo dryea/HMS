@@ -59,7 +59,7 @@ export default function HotelParticipants() {
         <div className="flex flex-col gap-12">
           <TextInput label="Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
           <TextInput label="Phone" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} />
-          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await api.participants.create({event_id:eventId,hotel_id:hotelId,...form});notifications.show({title:'Added',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Add</button>
+          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await api.participants.create({event_id:eventId,hotel_id:hotelId,...form});notifications.show({title:'Added',message:'Participant added successfully.',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Add</button>
         </div>
       </Modal>
     </div>

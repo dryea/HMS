@@ -17,7 +17,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then((reg) => {
       if ('sync' in reg) {
-        navigator.serviceWorker.ready.then((r) => r.sync.register('sync-checkins').catch(() => {}));
+        navigator.serviceWorker.ready.then((r: any) => r.sync.register('sync-checkins').catch(() => {}));
       }
     });
   });

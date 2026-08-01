@@ -14,9 +14,9 @@ app.get('/:eid/dates', async (c) => {
   ).bind(eid).all();
   // Group by date
   const byDate: Record<string, any> = {};
-  for (const r of results) {
+  for (const r of results as any[]) {
     if (!byDate[r.service_date]) byDate[r.service_date] = { date: r.service_date, services: [] };
-    if (r.menu_items) { try { r.menu_items = JSON.parse(r.menu_items); } catch { r.menu_items = []; } }
+    if (r.menu_items) { try { r.menu_items = JSON.parse(r.menu_items as string); } catch { r.menu_items = []; } }
     byDate[r.service_date].services.push(r);
   }
   return c.json(Object.values(byDate));
@@ -49,9 +49,9 @@ app.delete('/:eid/dates/:dateId', async (c) => {
 app.post('/:eid/assign', async (c) => {
   const eid = c.req.param('eid');
   const { participant_ids, date, type_id, hotel_id_override } = await c.req.json();
-  const eds = await c.env.DB.prepare(
+  const eds = (await c.env.DB.prepare(
     'SELECT id FROM event_date_services WHERE event_id=? AND service_date=? AND service_type_id=?'
-  ).bind(eid, date, type_id).first();
+  ).bind(eid, date, type_id).first()) as any;
   if (!eds) return c.json({ error: 'No service found' }, 400);
   let count = 0;
   for (const pid of participant_ids) {

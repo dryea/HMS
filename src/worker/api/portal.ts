@@ -60,12 +60,12 @@ app.post('/:token/announcements/:aid/read', async (c) => {
 });
 
 app.get('/:token/survey', async (c) => {
-  const p = await c.env.DB.prepare('SELECT id,event_id FROM participants WHERE qr_token=?').bind(c.req.param('token')).first();
+  const p = (await c.env.DB.prepare('SELECT id,event_id FROM participants WHERE qr_token=?').bind(c.req.param('token')).first()) as any;
   if (!p) return c.json({ error: 'Not found' }, 404);
-  const s = await c.env.DB.prepare('SELECT id,title,questions FROM surveys WHERE event_id=? AND active=1').bind(p.event_id).first();
+  const s = (await c.env.DB.prepare('SELECT id,title,questions FROM surveys WHERE event_id=? AND active=1').bind(p.event_id).first()) as any;
   if (!s) return c.json({ survey: null });
   const hasResponded = await c.env.DB.prepare('SELECT id FROM survey_responses WHERE survey_id=? AND participant_id=?').bind(s.id, p.id).first();
-  return c.json({ survey: { id: s.id, title: s.title, questions: JSON.parse(s.questions||'[]') }, has_responded: !!hasResponded });
+  return c.json({ survey: { id: s.id, title: s.title, questions: JSON.parse((s.questions as string)||'[]') }, has_responded: !!hasResponded });
 });
 
 app.post('/:token/survey', async (c) => {

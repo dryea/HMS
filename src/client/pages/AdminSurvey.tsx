@@ -10,9 +10,9 @@ export default function AdminSurvey() {
   const [responses,setResponses]=useState<any>(null);
   const [questions,setQuestions]=useState<any[]>([]);
   const [active,setActive]=useState(false);
-  const load=async()=>{if(!eventId)return;try{const s=await(await fetch('/api/surveys/'+eventId)).json();setSurvey(s.id?s:null);setQuestions(s.questions?(typeof s.questions==='string'?JSON.parse(s.questions):s.questions):[]);setActive(s.active?true:false);}catch{}try{const r=await(await fetch('/api/surveys/'+eventId+'/responses')).json();setResponses(r);}catch{}};
+  const load=async()=>{if(!eventId)return;try{const s=(await(await fetch('/api/surveys/'+eventId)).json()) as any;setSurvey(s.id?s:null);setQuestions(s.questions?(typeof s.questions==='string'?JSON.parse(s.questions):s.questions):[]);setActive(s.active?true:false);}catch{}try{const r=await(await fetch('/api/surveys/'+eventId+'/responses')).json();setResponses(r);}catch{}};
   useEffect(()=>{load();},[eventId]);
-  const save=async()=>{try{await fetch('/api/surveys/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions,active})});notifications.show({title:'Survey saved',color:'green'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const save=async()=>{try{await fetch('/api/surveys/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions,active})});notifications.show({title:'Survey saved',message:'The survey configuration has been saved successfully.',color:'green'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
   return(<div className="page-container">
     <h1 className="md3-headline-small m-0 mb-20">Post-Event Survey</h1>
     <div className="flex items-center gap-12 mb-20"><Switch label="Survey Active" checked={active} onChange={e=>setActive(e.currentTarget.checked)} /></div>

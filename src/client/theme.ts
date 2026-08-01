@@ -37,7 +37,7 @@ export const appTheme = createTheme({
     gray: ['#FCFCFC','#F6F6F6','#F0F0F0','#EBEBEB','#E5E5E5','#CBC4C4','#7B7575','#494545','#1C1B1B','#000000'],
     dark: ['#E8E4E4','#D0CCCC','#B8B4B4','#9C9898','#807C7C','#605C5C','#443F3F','#2A2626','#1F1C1C','#161414'],
   },
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
+  spacing: { xs: '4px', sm: '8px', md: '16px', lg: '24px', xl: '32px' },
   breakpoints: { xs: '480px', sm: '768px', md: '1024px', lg: '1280px', xl: '1440px' },
   shadows: {
     xs: '0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.30)',

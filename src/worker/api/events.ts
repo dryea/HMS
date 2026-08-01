@@ -30,7 +30,7 @@ app.post('/', async (c) => {
     const ehid = uid();
     await c.env.DB.prepare('INSERT INTO event_hotels (id,event_id,hotel_id) VALUES(?,?,?)').bind(ehid, id, hid).run();
     // Auto-generate staff code
-    const hotel = await c.env.DB.prepare('SELECT name FROM hotels WHERE id=?').bind(hid).first();
+    const hotel = (await c.env.DB.prepare('SELECT name FROM hotels WHERE id=?').bind(hid).first()) as any;
     if (hotel) {
       const scode = code + '-' + slug(hotel.name);
       await c.env.DB.prepare('UPDATE event_hotels SET code=? WHERE id=?').bind(scode, ehid).run();
@@ -95,8 +95,8 @@ app.delete('/:id/hotels/:hotelId/dedup', async (c) => {
   await c.env.DB.prepare('DELETE FROM event_hotels WHERE event_id=? AND hotel_id=?').bind(eid, hid).run();
   const ehid = uid();
   await c.env.DB.prepare('INSERT INTO event_hotels (id,event_id,hotel_id) VALUES(?,?,?)').bind(ehid, eid, hid).run();
-  const ev = await c.env.DB.prepare('SELECT event_code FROM events WHERE id=?').bind(eid).first();
-  const hotel = await c.env.DB.prepare('SELECT name FROM hotels WHERE id=?').bind(hid).first();
+  const ev = (await c.env.DB.prepare('SELECT event_code FROM events WHERE id=?').bind(eid).first()) as any;
+  const hotel = (await c.env.DB.prepare('SELECT name FROM hotels WHERE id=?').bind(hid).first()) as any;
   if (ev && hotel) {
     const scode = ev.event_code + '-' + hotel.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     await c.env.DB.prepare('UPDATE event_hotels SET code=? WHERE id=?').bind(scode, ehid).run();

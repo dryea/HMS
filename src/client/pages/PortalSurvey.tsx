@@ -8,9 +8,9 @@ export default function PortalSurvey() {
   const {token}=useParams();const nav=useNavigate();
   const [survey,setSurvey]=useState<any>(null);const [hasResponded,setHasResponded]=useState(false);
   const [answers,setAnswers]=useState<Record<string,any>>({});const [saving,setSaving]=useState(false);
-  useEffect(()=>{if(token)fetch('/api/portal/'+token+'/survey').then(r=>r.json()).then(d=>{setSurvey(d.survey);setHasResponded(d.has_responded);}).catch(()=>{});},[token]);
+  useEffect(()=>{if(token)fetch('/api/portal/'+token+'/survey').then(r=>r.json()).then((d: any)=>{setSurvey(d.survey);setHasResponded(d.has_responded);}).catch(()=>{});},[token]);
   const answered=survey?.questions?.filter((q:any)=>answers[q.id]!==undefined&&answers[q.id]!=='').length||0;const total=survey?.questions?.length||0;const progress=total?Math.round((answered/total)*100):0;
-  const submit=async()=>{setSaving(true);try{await fetch('/api/portal/'+token+'/survey',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers})});setHasResponded(true);notifications.show({title:'Thank you!',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}setSaving(false);};
+  const submit=async()=>{setSaving(true);try{await fetch('/api/portal/'+token+'/survey',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers})});setHasResponded(true);notifications.show({title:'Thank you!',message:'Your responses have been submitted.',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}setSaving(false);};
   if(!survey)return<div className="page-container" style={{maxWidth:480}}><div className="md3-card p-24" style={{textAlign:'center'}}><p className="md3-body-medium" style={{color:'var(--md-on-surface-variant)'}}>No survey available</p></div></div>;
   if(hasResponded)return<div className="page-container" style={{maxWidth:480}}><div className="md3-card p-24" style={{textAlign:'center'}}><IconCheck size={48} style={{color:'var(--md-tertiary)',marginBottom:8}}/><h2 className="md3-title-large m-0">Thank You!</h2></div></div>;
   return(<div className="page-container" style={{maxWidth:480}}>

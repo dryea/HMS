@@ -99,7 +99,7 @@ export default function Participants() {
           <TextInput label="Phone" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} />
           <TextInput label="Email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
           <TextInput label="Company" value={form.company} onChange={e=>setForm({...form,company:e.target.value})} />
-          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await api.participants.create({event_id:eventId,...form});notifications.show({title:'Added',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Add</button>
+          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await api.participants.create({event_id:eventId,...form});notifications.show({title:'Added',message:'Participant added successfully.',color:'green'});close();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Add</button>
         </div>
       </Modal>
 
@@ -107,7 +107,7 @@ export default function Participants() {
         <div className="flex flex-col gap-12">
           <TextInput label="Child Name" value={childForm.name} onChange={e=>setChildForm({...childForm,name:e.target.value})} />
           <TextInput label="Age" type="number" value={childForm.age} onChange={e=>setChildForm({...childForm,age:e.target.value})} />
-          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await fetch('/api/participants/'+childForm.participant_id+'/children',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:childForm.name,age:parseInt(childForm.age)||0})});notifications.show({title:'Child added',color:'green'});closeChild();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Add</button>
+          <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{try{await fetch('/api/participants/'+childForm.participant_id+'/children',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:childForm.name,age:parseInt(childForm.age)||0})});notifications.show({title:'Child added',message:'Child added to participant successfully.',color:'green'});closeChild();load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Add</button>
         </div>
       </Modal>
 
@@ -131,7 +131,7 @@ export default function Participants() {
                 if(!lines.length){notifications.show({title:'No data found',message:'Ensure first row is headers: ein,name,phone,email,company,department,children',color:'red'});return;}
                 const result = await api.participants.bulk({event_id:eventId,hotel_id:form.hotel_id||null,participants:lines});
                 if(result?.participants){for(let i=0;i<result.participants.length;i++){const ch=lines[i]?.children;if(ch){ch.split(';').filter(Boolean).forEach((c:string)=>{const m=c.match(/(.+?)\((\d+)\)/);if(m)fetch('/api/participants/'+result.participants[i].id+'/children',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:m[1].trim(),age:parseInt(m[2])})});});}}}
-                notifications.show({title:'Imported '+lines.length+' participants',color:'green'});closeBulk();load();
+                notifications.show({title:'Imported',message:'Successfully imported '+lines.length+' participants.',color:'green'});closeBulk();load();
               }catch(err){notifications.show({title:'Error',message:'Could not parse file',color:'red'});}
             }} />
           <div className="flex items-center gap-8"><div style={{flex:1,height:1,background:'var(--md-outline-variant)'}}/><span className="md3-body-small" style={{color:'var(--md-on-surface-variant)'}}>or paste CSV</span><div style={{flex:1,height:1,background:'var(--md-outline-variant)'}}/></div>
@@ -139,11 +139,11 @@ export default function Participants() {
           <textarea className="md3-text-field" rows={8} placeholder="1992, John Doe, +977, j@c.com, Acme, Sales, Aarav(3);Neha(5)" value={bulkText} onChange={e=>setBulkText(e.target.value)} style={{minHeight:160}} />
           <button className="md3-btn" style={{width:'100%'}} onClick={async()=>{
             const lines = bulkText.trim().split('\n').map(l=>{const p=l.split(',').map(s=>s.trim());const ch=p[6]||'';return{ein:p[0]||'',name:p[1]||'',phone:p[2]||'',email:p[3]||'',company:p[4]||'',department:p[5]||'',children:ch};}).filter(p=>p.name);
-            if(!lines.length){notifications.show({title:'Nothing to import',color:'red'});return;}
+            if(!lines.length){notifications.show({title:'Nothing to import',message:'Please enter valid CSV data first.',color:'red'});return;}
             try{
               const r = await api.participants.bulk({event_id:eventId,hotel_id:form.hotel_id||null,participants:lines});
               if(r?.participants){for(let i=0;i<r.participants.length;i++){const ch=lines[i]?.children;if(ch){ch.split(';').filter(Boolean).forEach((c:string)=>{const m=c.match(/(.+?)\((\d+)\)/);if(m)fetch('/api/participants/'+r.participants[i].id+'/children',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:m[1].trim(),age:parseInt(m[2])})});});}}}
-              notifications.show({title:'Imported',color:'green'});closeBulk();load();
+              notifications.show({title:'Imported',message:'Successfully imported participants.',color:'green'});closeBulk();load();
             }catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
           }}>Import</button>
         </div>

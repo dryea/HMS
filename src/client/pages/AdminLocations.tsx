@@ -12,9 +12,9 @@ export default function AdminLocations() {
   const [opened,{open,close}]=useDisclosure(false);
   const [editId,setEditId]=useState<string|null>(null);
   const [form,setForm]=useState({name:'',description:'',floor:'',hotel_id:'',pin_x:0,pin_y:0});
-  const load=async()=>{if(!eventId)return;try{setLocations(await(await fetch('/api/locations/'+eventId)).json());}catch{}try{setHotels(await fetch('/api/hotels').then(r=>r.json()));}catch{}};
+  const load=async()=>{if(!eventId)return;try{setLocations((await(await fetch('/api/locations/'+eventId)).json()) as any[]);}catch{}try{setHotels((await fetch('/api/hotels').then(r=>r.json())) as any[]);}catch{}};
   useEffect(()=>{load();},[eventId]);
-  const save=async()=>{try{const body={...form,pin_x:form.pin_x||null,pin_y:form.pin_y||null};if(editId){await fetch('/api/locations/'+eventId+'/'+editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}else{await fetch('/api/locations/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}notifications.show({title:editId?'Updated':'Created',color:'green'});close();setEditId(null);load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const save=async()=>{try{const body={...form,pin_x:form.pin_x||null,pin_y:form.pin_y||null};if(editId){await fetch('/api/locations/'+eventId+'/'+editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}else{await fetch('/api/locations/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}notifications.show({title:editId?'Updated':'Created',message:editId?'Location details updated':'New location created',color:'green'});close();setEditId(null);load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
   return(<div className="page-container">
     <div className="flex items-center justify-between mb-20"><h1 className="md3-headline-small m-0">Locations</h1><button className="md3-btn" onClick={()=>{setEditId(null);setForm({name:'',description:'',floor:'',hotel_id:'',pin_x:0,pin_y:0});open();}}><IconPlus size={18}/> Add</button></div>
     <div style={{overflowX:'auto'}}><table><thead><tr><th>Name</th><th>Floor</th><th>Hotel</th><th>Actions</th></tr></thead><tbody>

@@ -1,13 +1,13 @@
 const BASE = '';
 
-async function req(path: string, opts?: RequestInit) {
+async function req(path: string, opts?: RequestInit): Promise<any> {
   const res = await fetch(BASE + path, {
     headers: { 'Content-Type': 'application/json', ...opts?.headers },
     ...opts,
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error || 'API Error');
+    throw new Error((err as any).error || 'API Error');
   }
   return res.json();
 }

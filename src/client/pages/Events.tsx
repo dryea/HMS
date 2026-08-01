@@ -20,7 +20,7 @@ export default function Events() {
   const load = async () => { setLoading(true); try { setEvents(await api.events.list()); } catch {} try { setHotels(await fetch('/api/hotels').then(r=>r.json())); } catch {} setLoading(false); };
   useEffect(() => { load(); }, []);
 
-  const copyCode = (code:string)=>{navigator.clipboard.writeText(code);notifications.show({title:'Copied: '+code,color:'blue'});};
+  const copyCode = (code:string)=>{navigator.clipboard.writeText(code);notifications.show({title:'Copied',message:'Code '+code+' copied to clipboard',color:'blue'});};
 
   if(loading) return <div className="page-container">{[1,2].map(i=><Skeleton key={i} height={160} radius={16} mb={12} />)}</div>;
 
@@ -81,11 +81,11 @@ export default function Events() {
               if(editEvent){await api.events.update(editEvent.id,{name:form.name,description:form.description,start_date:form.start_date,end_date:form.end_date});}
               else{
                 let hotelIds=[...selectedHotels];
-                if(createNewHotel&&form.hotel_name){const h=await fetch('/api/hotels',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:form.hotel_name,address:form.hotel_address,contact_person:form.contact_person,contact_phone:form.contact_phone})});hotelIds.push((await h.json()).id);}
+                if(createNewHotel&&form.hotel_name){const h=await fetch('/api/hotels',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:form.hotel_name,address:form.hotel_address,contact_person:form.contact_person,contact_phone:form.contact_phone})});const hotelRes = (await h.json()) as any;hotelIds.push(hotelRes.id);}
                 if(!hotelIds.length){notifications.show({title:'Error',message:'Select at least one hotel',color:'red'});return;}
                 await api.events.create({hotel_ids:hotelIds,name:form.name,description:form.description,start_date:form.start_date,end_date:form.end_date,event_code:form.event_code});
               }
-              notifications.show({title:editEvent?'Updated':'Created',color:'green'});close();setEditEvent(null);setForm({name:'',description:'',start_date:'',end_date:'',event_code:'',hotel_name:'',hotel_address:'',contact_person:'',contact_phone:''});setSelectedHotels([]);setCreateNewHotel(false);load();
+              notifications.show({title:editEvent?'Updated':'Created',message:editEvent?'Event updated successfully':'Event created successfully',color:'green'});close();setEditEvent(null);setForm({name:'',description:'',start_date:'',end_date:'',event_code:'',hotel_name:'',hotel_address:'',contact_person:'',contact_phone:''});setSelectedHotels([]);setCreateNewHotel(false);load();
             }catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}
           }}>{editEvent?'Update':'Create'}</button>
         </div>

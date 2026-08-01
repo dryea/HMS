@@ -12,7 +12,7 @@ function DraggableParticipant({ p }: { p: any }) {
     cursor: 'grab',
   };
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}
+    <div ref={setNodeRef} {...listeners} {...attributes}
       className="md3-chip" data-selected style={{ ...style, margin: 4, display: 'inline-flex' }}>
       <IconUser size={14}/> {p.name}
     </div>
@@ -43,7 +43,7 @@ export default function RoomVisualizer({ rooms, unassigned, onChanged }: { rooms
     const bedId = String(over.id).replace('bed_', '');
     try {
       await api.participants.assignBed(pid, bedId);
-      notifications.show({ title: 'Assigned', color: 'green' });
+      notifications.show({ title: 'Assigned', message: 'Participant assigned to bed successfully.', color: 'green' });
       onChanged();
     } catch (err: any) {
       notifications.show({ title: 'Error', message: err.message, color: 'red' });

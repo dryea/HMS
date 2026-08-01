@@ -21,15 +21,15 @@ export default function StaffDashboard() {
 
   const event=session?.event;const hotel=session?.hotel;
 
-  const load=async()=>{if(!event?.id||!hotel?.id)return;try{setDash(await api.reporting.dashboardByHotel(event.id,hotel.id));}catch{}try{setRooms(await api.rooms.listByHotel(event.id,hotel.id));}catch{}try{setHistory(await api.checkin.list(event.id));}catch{}};
+  const load=async()=>{if(!event?.id||!hotel?.id)return;try{setDash(await api.reporting.dashboardByHotel(event.id,hotel.id));}catch{}try{setRooms((await api.rooms.listByHotel(event.id,hotel.id)) as any[]);}catch{}try{setHistory((await api.checkin.list(event.id)) as any[]);}catch{}};
   useEffect(()=>{if(!session)nav('/');load();},[]);
 
   const startScanner=useCallback(async()=>{
-    try{const{Html5Qrcode:H5Q}=await import('html5-qrcode');const s=new H5Q('qr-reader');await s.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:250}},async(decodedText:string)=>{await s.stop();setScanMode(false);const token=decodedText.split('token=')[1]?.split('&')[0]||decodedText;doCheckin(token);});setScanner(s);setScanMode(true);}
+    try{const{Html5Qrcode:H5Q}=await import('html5-qrcode');const s=new H5Q('qr-reader');await s.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:250}},async(decodedText:string)=>{await s.stop();setScanMode(false);const token=decodedText.split('token=')[1]?.split('&')[0]||decodedText;doCheckin(token);},()=>{});setScanner(s);setScanMode(true);}
     catch{notifications.show({title:'Camera Error',message:'Use manual entry instead',color:'red'});}
   },[event,hotel]);
 
-  const doCheckin=async(token:string)=>{try{const res=await api.checkin.scan(token,'Staff',hotel?.id);setResult(res);setHistory(prev=>[{participant:res.participant,status:res.status,time:new Date().toLocaleTimeString()},...prev].slice(0,10));if(navigator.vibrate)navigator.vibrate(30);notifications.show({title:res.participant||'Checked in',message:'Status: '+res.status,color:'green'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const doCheckin=async(token:string)=>{try{const res:any=await api.checkin.scan(token,'Staff',hotel?.id);setResult(res);setHistory(prev=>[{participant:res.participant,status:res.status,time:new Date().toLocaleTimeString()},...prev].slice(0,10));if(navigator.vibrate)navigator.vibrate(30);notifications.show({title:res.participant||'Checked in',message:'Status: '+res.status,color:'green'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
 
   if(!event||!hotel)return<div className="page-container"><p>Not logged in</p></div>;
   const recentCheckins=history.slice(0,10);
@@ -71,10 +71,10 @@ export default function StaffDashboard() {
 
     {tab==='attendance'&&<div className="md3-card p-16">
       <h3 className="md3-title-medium m-0 mb-12">Today's Meals</h3>
-      <input type="date" className="md3-text-field" style={{minHeight:40,padding:'0 12px',marginBottom:12}} defaultValue={new Date().toISOString().split('T')[0]} onChange={async(e)=>{try{const dates=await(await fetch('/api/services/'+event.id+'/dates')).json();const day=dates.find((d:any)=>d.date===e.target.value);setServiceData(day?.services||[]);}catch{}}} />
+      <input type="date" className="md3-text-field" style={{minHeight:40,padding:'0 12px',marginBottom:12}} defaultValue={new Date().toISOString().split('T')[0]} onChange={async(e)=>{try{const dates = (await(await fetch('/api/services/'+event.id+'/dates')).json()) as any;const day=dates.find((d:any)=>d.date===e.target.value);setServiceData(day?.services||[]);}catch{}}} />
       {serviceData.map((svc:any)=>(<div key={svc.id} className="md3-card p-12 mb-8" style={{background:'var(--md-surface)'}}>
         <div className="flex items-center justify-between mb-8"><span className="md3-title-small">{svc.service_name}</span><span className="md3-badge" style={{background:'var(--md-surface-container-high)',color:'var(--md-on-surface)'}}>{svc.start_time||''}-{svc.end_time||''}</span></div>
-        <button className="md3-btn-text" style={{color:'var(--md-tertiary)'}} onClick={async()=>{try{await fetch('/api/services/'+event.id+'/attendance/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event_date_service_id:svc.id})});notifications.show({title:'All marked present',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Mark All Present</button>
+        <button className="md3-btn-text" style={{color:'var(--md-tertiary)'}} onClick={async()=>{try{await fetch('/api/services/'+event.id+'/attendance/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event_date_service_id:svc.id})});notifications.show({title:'All marked present',message:'All participants have been marked present.',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}}>Mark All Present</button>
       </div>))}
       {serviceData.length===0&&<p className="md3-body-medium" style={{color:'var(--md-on-surface-variant)'}}>No services scheduled</p>}
     </div>}

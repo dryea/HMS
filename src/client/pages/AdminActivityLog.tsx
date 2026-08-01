@@ -28,7 +28,7 @@ export default function AdminActivityLog() {
         <div className="flex flex-col gap-8">
           {logs.map((log:any) => {
             const Icon = ACTION_ICONS[log.action] || IconBell;
-            let details = '';
+            let details: any = {};
             try { details = log.details ? JSON.parse(log.details) : {}; } catch {}
             return (
               <div key={log.id} className="md3-card p-12">

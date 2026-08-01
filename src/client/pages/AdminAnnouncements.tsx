@@ -12,13 +12,13 @@ export default function AdminAnnouncements() {
   const [form,setForm]=useState({title:'',message:'',priority:'normal'});
   const load=async()=>{if(!eventId)return;try{setAnnouncements(await(await fetch('/api/announcements/'+eventId)).json());}catch{}};
   useEffect(()=>{load();},[eventId]);
-  const send=async()=>{try{await fetch('/api/announcements/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});notifications.show({title:'Sent',color:'green'});close();setForm({title:'',message:'',priority:'normal'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const send=async()=>{try{await fetch('/api/announcements/'+eventId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});notifications.show({title:'Sent',message:'Announcement sent successfully.',color:'green'});close();setForm({title:'',message:'',priority:'normal'});load();}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
   return(<div className="page-container">
     <div className="flex items-center justify-between mb-20"><h1 className="md3-headline-small m-0">Announcements</h1>      <button className="md3-btn" style={{height:36,padding:'0 16px'}} onClick={async()=>{
-        const subs = await (await fetch('/api/system/push/subscriptions?event_id='+eventId)).json();
+        const subs = (await (await fetch('/api/system/push/subscriptions?event_id='+eventId)).json()) as any;
         if(!subs.length){notifications.show({title:'No subscribers',message:'No participants subscribed to push yet',color:'red'});return;}
         await fetch('/api/system/push/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event_id:eventId,title:'New announcement',message:'Check your announcements'})});
-        notifications.show({title:'Queued to '+subs.length+' subscribers',color:'green'});
+        notifications.show({title:'Queued Broadcast',message:'Queued to '+subs.length+' subscribers',color:'green'});
       }}><IconSend size={16}/> Push</button>
       <button className="md3-btn" onClick={open}><IconPlus size={18}/> New</button></div>
     {announcements.map((a:any)=>(<div key={a.id} className="md3-card p-16 mb-12">

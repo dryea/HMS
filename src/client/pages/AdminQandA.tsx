@@ -8,7 +8,7 @@ export default function AdminQandA() {
   const {id:eventId,sid}=useParams();
   const [questions,setQuestions]=useState<any[]>([]);
   const [session,setSession]=useState<any>(null);
-  const load=async()=>{if(!eventId||!sid)return;try{setQuestions(await(await fetch('/api/event-config/sessions/'+eventId+'/'+sid+'/questions')).json());}catch{}try{const s=await(await fetch('/api/sessions/'+eventId)).json();setSession(s.find((x:any)=>x.id===sid));}catch{}};
+  const load=async()=>{if(!eventId||!sid)return;try{setQuestions(await(await fetch('/api/event-config/sessions/'+eventId+'/'+sid+'/questions')).json());}catch{}try{const s = (await(await fetch('/api/sessions/'+eventId)).json()) as any[];setSession(s.find((x:any)=>x.id===sid));}catch{}};
   useEffect(()=>{load();},[eventId,sid]);
   return(<div className="page-container">
     <h1 className="md3-headline-small m-0 mb-20">Q&A: {session?.title}</h1>

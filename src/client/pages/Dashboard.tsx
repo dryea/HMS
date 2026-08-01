@@ -91,7 +91,7 @@ export default function Dashboard() {
 
       <div className="md3-card p-20">
         <h3 className="md3-title-medium m-0 mb-12">QR Codes</h3>
-        <button className="md3-btn" onClick={async()=>{try{const r=await api.qr.generate(eventId);setQrDone(true);notifications.show({title:'QR Generated '+r.count+' codes',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}} style={{background:qrDone?'var(--md-tertiary)':'var(--md-primary)'}}>{qrDone?'QR Generated':'Generate All QR Codes'}</button>
+        <button className="md3-btn" onClick={async()=>{try{const r=await api.qr.generate(eventId!);setQrDone(true);notifications.show({title:'QR Generated',message:'Successfully generated '+r.count+' codes',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}}} style={{background:qrDone?'var(--md-tertiary)':'var(--md-primary)'}}>{qrDone?'QR Generated':'Generate All QR Codes'}</button>
       </div>
     </div>
   );

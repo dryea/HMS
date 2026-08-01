@@ -7,8 +7,8 @@ import { TextInput } from '@mantine/core';
 export default function PortalDietary() {
   const {token}=useParams();const nav=useNavigate();
   const [dietary,setDietary]=useState('');
-  useEffect(()=>{if(token)fetch('/api/portal/'+token+'/dietary').then(r=>r.json()).then(d=>setDietary(d.dietary||'')).catch(()=>{});},[token]);
-  const save=async()=>{try{await fetch('/api/portal/'+token+'/dietary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dietary})});notifications.show({title:'Saved',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  useEffect(()=>{if(token)fetch('/api/portal/'+token+'/dietary').then(r=>r.json()).then((d: any)=>setDietary(d.dietary||'')).catch(()=>{});},[token]);
+  const save=async()=>{try{await fetch('/api/portal/'+token+'/dietary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dietary})});notifications.show({title:'Saved',message:'Dietary preferences have been updated.',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
   return(<div className="page-container" style={{maxWidth:480}}>
     <div className="flex items-center gap-8 mb-20"><button className="md3-btn-text" onClick={()=>nav(-1)}><IconArrowLeft size={20}/></button><h1 className="md3-headline-small m-0">Dietary Preferences</h1></div>
     <div className="md3-card p-20"><p className="md3-body-medium mb-16">Let us know about any dietary requirements.</p>

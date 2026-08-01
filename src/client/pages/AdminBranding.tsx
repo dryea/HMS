@@ -9,10 +9,10 @@ export default function AdminBranding() {
   const [logo,setLogo]=useState('');
   const [bannerColor,setBannerColor]=useState('#1C1B1B');
   const [accentColor,setAccentColor]=useState('#8C4A48');
-  const load=async()=>{if(!eventId)return;try{const b=await(await fetch('/api/branding/'+eventId)).json();setLogo(b.logo_url||'');setBannerColor(b.banner_color||'#1C1B1B');setAccentColor(b.accent_color||'#8C4A48');}catch{}};
+  const load=async()=>{if(!eventId)return;try{const b=(await(await fetch('/api/branding/'+eventId)).json()) as any;setLogo(b.logo_url||'');setBannerColor(b.banner_color||'#1C1B1B');setAccentColor(b.accent_color||'#8C4A48');}catch{}};
   useEffect(()=>{load();},[eventId]);
-  const save=async()=>{try{await fetch('/api/branding/'+eventId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({logo_url:logo,banner_color:bannerColor,accent_color:accentColor})});notifications.show({title:'Branding updated',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
-  const uploadLogo=async(file:File|null)=>{if(!file)return;const fd=new FormData();fd.append('file',file);try{const r=await(await fetch('/api/event-config/upload/logo/'+eventId,{method:'POST',body:fd})).json();setLogo(r.url);notifications.show({title:'Logo uploaded',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const save=async()=>{try{await fetch('/api/branding/'+eventId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({logo_url:logo,banner_color:bannerColor,accent_color:accentColor})});notifications.show({title:'Branding updated',message:'The event branding has been updated.',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
+  const uploadLogo=async(file:File|null)=>{if(!file)return;const fd=new FormData();fd.append('file',file);try{const r=(await(await fetch('/api/event-config/upload/logo/'+eventId,{method:'POST',body:fd})).json()) as any;setLogo(r.url);notifications.show({title:'Logo uploaded',message:'New logo uploaded successfully.',color:'green'});}catch(e:any){notifications.show({title:'Error',message:e.message,color:'red'});}};
   return(<div className="page-container">
     <h1 className="md3-headline-small m-0 mb-20"><IconPalette size={24} style={{verticalAlign:'middle',marginRight:8}}/>Event Branding</h1>
     <div className="md3-card p-24"><div className="flex flex-col gap-16">

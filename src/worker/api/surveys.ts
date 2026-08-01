@@ -29,21 +29,21 @@ app.post('/:eid/response', async (c) => {
 });
 
 app.get('/:eid/responses', async (c) => {
-  const s = await c.env.DB.prepare('SELECT id,questions FROM surveys WHERE event_id=?').bind(c.req.param('eid')).first();
+  const s = (await c.env.DB.prepare('SELECT id,questions FROM surveys WHERE event_id=?').bind(c.req.param('eid')).first()) as any;
   if (!s) return c.json({ responses: [], analytics: {} });
   const { results } = await c.env.DB.prepare(
     'SELECT r.*,p.name as participant_name FROM survey_responses r JOIN participants p ON p.id=r.participant_id WHERE r.survey_id=? ORDER BY r.submitted_at'
   ).bind(s.id).all();
   // Build analytics
-  const questions = JSON.parse(s.questions||'[]');
+  const questions = JSON.parse((s.questions as string)||'[]');
   const analytics: any = {};
   for (const q of questions) {
     const counts: Record<string, number> = {};
     if (q.type === 'rating') {
       for (let i = 1; i <= 5; i++) counts[String(i)] = 0;
     }
-    for (const r of results) {
-      const ans = JSON.parse(r.answers||'{}');
+    for (const r of results as any[]) {
+      const ans = JSON.parse((r.answers as string)||'{}');
       const val = ans[q.id];
       if (val) { counts[String(val)] = (counts[String(val)]||0) + 1; }
     }

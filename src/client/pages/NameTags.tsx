@@ -6,7 +6,7 @@ import { api } from '../api/client';
 export default function NameTags() {
   const { id: eventId } = useParams();
   const [participants, setParticipants] = useState<any[]>([]);
-  const [hotels, setHotels] = useState<any[]>([]);
+  const [hotels, setHotels] = useState<any>(null);
   const [filter, setFilter] = useState('');
 
   const load = async () => {
