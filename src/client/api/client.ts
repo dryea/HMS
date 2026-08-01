@@ -56,4 +56,11 @@ export const api = {
     dashboardByHotel: (eid: string, hid: string) => req('/api/reporting/dashboard/' + eid + '/hotel/' + hid),
     superAdmin: () => req('/api/reporting/super-admin'),
   },
+  services: {
+    listDates: (eid: string) => req('/api/services/' + eid + '/dates'),
+    getParticipants: (eid: string, edsId: string) => req('/api/services/' + eid + '/participants/' + edsId),
+    markAttendance: (eid: string, d: any) => req('/api/services/' + eid + '/attendance', { method: 'POST', body: JSON.stringify(d) }),
+    scanAttendance: (eid: string, d: any) => req('/api/services/' + eid + '/attendance/scan', { method: 'POST', body: JSON.stringify(d) }),
+    markBulk: (eid: string, d: any) => req('/api/services/' + eid + '/attendance/bulk', { method: 'POST', body: JSON.stringify(d) }),
+  },
 };
